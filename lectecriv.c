@@ -1,11 +1,7 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
-
-pthread_mutex_t mutex;
-sem_t db;  // accès à la db
-int readcount = 0; // nombre de readers
-sem_init(&db, 0, 1);
+#include <stdbool.h>
 
 pthread_mutex_t mutex_readcount; //Protège readcount
 pthread_mutex_t mutex_writecount; //Protège writecount
@@ -15,8 +11,8 @@ pthread_mutex_t z;
 sem_t wsem; //Accès exclusif à la db
 sem_t rsem; //Pour bloquer des readers
 
-int readCount = 0;
-int writeCount = 0;
+int readcount = 0;
+int writecount = 0;
 
 sem_init(&wsem,0,1);
 sem_init(&rsem,0,1);
@@ -28,8 +24,8 @@ void writer(void)
     {
         prepare_data();
         pthread_mutex_lock(&mutex_writecount);
-        writeCount++;
-        if (writeCount==1)
+        writecount++;
+        if (writecount==1)
         {
             sem_wait(&rsem);
         }
@@ -40,8 +36,8 @@ void writer(void)
         sem_post(&wsem);
 
         pthread_mutex_lock(&mutex_writecount);
-        writeCount--;
-        if(writeCount==0)
+        writecount--;
+        if(writecount==0)
         {
             sem_post(&rsem);
         }
@@ -58,7 +54,7 @@ void reader(void)
         sem_wait(&rsem); //un seul reader à la fois
         pthread_mutex_lock(&mutex_readcount);
         readcount++;
-        if (readCount==1)
+        if (readcount==1)
         {
             sem_wait(&wsem);
         }
@@ -74,7 +70,7 @@ void reader(void)
 
         pthread_mutex_lock(&mutex_readcount);
         readcount--;
-        if(readCount==0)
+        if(readcount==0)
         {
             sem_post(&wsem);
         }
@@ -82,4 +78,8 @@ void reader(void)
 
         process_data();
     }
+}
+
+int main(int argc, char *argv[]){
+    
 }
