@@ -13,12 +13,16 @@ void mange(int id) {
     printf("Philosophe [%d] mange\n",id);
 }
 
+void pense(int id){
+    printf("Philosophe [%d] pense\n",id);
+}
+
 void* philosophe( void* arg ){
     int *id=(int *) arg;
     int left = *id;
     int right = (left + 1) % PHILOSOPHES;
     while(true){
-        // philosophe pense
+        pense(*id);
         if(left<right){
             pthread_mutex_lock(&baguette[left]);
             pthread_mutex_lock(&baguette[right]);
@@ -31,4 +35,8 @@ void* philosophe( void* arg ){
         pthread_mutex_unlock(&baguette[right]);
     }
     return (NULL);
+}
+
+int main(int argc, char * argv[]){
+
 }
