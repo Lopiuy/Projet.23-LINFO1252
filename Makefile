@@ -1,7 +1,8 @@
 
 
 philo: philosophe.c
-	gcc -o prog -Wall philosophe.c
+	gcc -o philo -Wall philosophe.c
+
 
 
 zip:
