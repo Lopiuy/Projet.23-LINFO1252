@@ -13,7 +13,7 @@ void mange(int id) {
     printf("Philosophe [%d] mange\n",id);
 }
 
-void* philosophe ( void* arg ){
+void* philosophe( void* arg ){
     int *id=(int *) arg;
     int left = *id;
     int right = (left + 1) % PHILOSOPHES;
