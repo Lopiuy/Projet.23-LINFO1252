@@ -1,6 +1,6 @@
 
 
-philo: main.c
+philo: philosophe.c
 	gcc -o prog -Wall main.c
 
 
