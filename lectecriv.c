@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdbool.h>
+#include <errno.h>
 
 pthread_mutex_t mutex_readcount; //Protège readcount
 pthread_mutex_t mutex_writecount; //Protège writecount
@@ -13,9 +15,6 @@ sem_t rsem; //Pour bloquer des readers
 
 int readcount = 0;
 int writecount = 0;
-
-sem_init(&wsem,0,1);
-sem_init(&rsem,0,1);
 
 
 void writer(void)
@@ -81,5 +80,11 @@ void reader(void)
 }
 
 int main(int argc, char *argv[]){
+
+    if (sem_init(&wsem,0,1) == -1 || sem_init(&rsem,0,1) == -1) {
+        fprintf(stderr, "Error : %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
     
 }
