@@ -5,40 +5,38 @@
 #include <stdbool.h>
 #include <unistd.h>
 
+pthread_mutex_t* baguette_mutex;
+int nb_philosophs = 0;
 
-void mange(int id) {
-    //fprintf(stderr,"Philosophe [%d] mange\n",id);
+
+void eat(int id) {
+    fprintf(stderr,"Philosophe [%d] mange\n",id);
+    return;
 }
 
-void pense(int id){
-    //fprintf(stderr,"Philosophe [%d] pense\n",id);
+void think(int id){
+    fprintf(stderr,"Philosophe [%d] pense\n",id);
+    return;
 }
-
-struct parse_arg{
-    int id;
-    int nb_philosophes;
-    pthread_mutex_t* baguette;
-};
 
 void* philosophe(void* args){
-    //fprintf(stderr,"%s","DEBUT");
-    struct parse_arg* arg = (struct parse_arg*) args;
-    int id = arg->id;
-    int left = id;
-    int right = (left + 1) % arg->nb_philosophes;
+    fprintf(stderr,"%s\n","DEBUT");
+    int *id = (int*)args;
+    int left = *id;
+    int right = (left + 1) % nb_philosophs;
     int i = 0;
-    while(i < 100000){
-        pense(id);
+    while(i < 5){  //100000
+        think(*id);
         if(left<right){
-            pthread_mutex_lock(&arg->baguette[left]);
-            pthread_mutex_lock(&arg->baguette[right]);
+            pthread_mutex_lock(&baguette_mutex[left]);
+            pthread_mutex_lock(&baguette_mutex[right]);
         }else{
-            pthread_mutex_lock(&arg->baguette[right]);
-            pthread_mutex_lock(&arg->baguette[left]);
+            pthread_mutex_lock(&baguette_mutex[right]);
+            pthread_mutex_lock(&baguette_mutex[left]);
         }
-        mange(id);
-        pthread_mutex_unlock(&arg->baguette[left]);
-        pthread_mutex_unlock(&arg->baguette[right]);
+        eat(*id);
+        pthread_mutex_unlock(&baguette_mutex[left]);
+        pthread_mutex_unlock(&baguette_mutex[right]);
         i++;
     }
     return (NULL);
@@ -46,36 +44,35 @@ void* philosophe(void* args){
 
 int main(int argc, char * argv[]){
 
-    if(argc == 1){
+    if(argc != 2){
         fprintf(stderr,"%s","Please enter number of philosophes");
         return -1;
     }
-    struct parse_arg args = {.nb_philosophes = atoi(argv[1])};
+    nb_philosophs = atoi(argv[1]);
 
-    pthread_t phil[args.nb_philosophes];
-    pthread_mutex_t baguette[args.nb_philosophes];
+    pthread_t phil[nb_philosophs];
+    baguette_mutex = (pthread_mutex_t*) malloc(nb_philosophs * sizeof(pthread_mutex_t));
 
-    //faire des mutex des variable globales pour pas devoir les mettre en argument
+    for (int i = 0; i < nb_philosophs; i++) {
+        if(pthread_mutex_init(&baguette_mutex[i],NULL)){perror("Mutex initailisation failed with error"); exit(1);}
+    }
 
-
-    args.baguette = (pthread_mutex_t*) malloc(args.nb_philosophes * sizeof(pthread_mutex_t));
-    memcpy(args.baguette,baguette,args.nb_philosophes * sizeof(pthread_mutex_t));
-
-
-    for(int i = 0; i < args.nb_philosophes; i++){
-        args.id = i;
-        struct parse_arg* param = (struct parse_arg*) malloc(sizeof(struct parse_arg));
-
-        memcpy(param,&args,sizeof(struct parse_arg));
-        if (pthread_create(&phil[i], NULL, &philosophe, (void *) param) != 0){
+    for(int i = 0; i < nb_philosophs; i++){
+        int* id = (int*)malloc(sizeof(int));
+        memcpy(id,&i,sizeof(int));
+        if (pthread_create(&phil[i], NULL, &philosophe, (void *) id) != 0){
             perror("Creation of philosopher thread failed.");
         }
     }
 
-    for (int i = 0; i < args.nb_philosophes; i++){
+    for (int i = 0; i < nb_philosophs; i++){
         if (pthread_join(phil[i], NULL) != 0){
             perror("Try to join philosopher thread failed.");
         }
+    }
+
+    for (int i = 0; i < nb_philosophs; i++) {
+        if(pthread_mutex_destroy(&baguette_mutex[i])){perror("Mutex destroy failed with error"); exit(1);}
     }
 
 }
