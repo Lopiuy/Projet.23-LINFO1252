@@ -47,13 +47,15 @@ void* philosophe(void* args){
 int main(int argc, char * argv[]){
 
     if(argc == 1){
-        printf("%s","Please enter number of philosophes");
+        fprintf(stderr,"%s","Please enter number of philosophes");
         return -1;
     }
     struct parse_arg args = {.nb_philosophes = atoi(argv[1])};
 
     pthread_t phil[args.nb_philosophes];
     pthread_mutex_t baguette[args.nb_philosophes];
+
+    //faire des mutex des variable globales pour pas devoir les mettre en argument
 
 
     args.baguette = (pthread_mutex_t*) malloc(args.nb_philosophes * sizeof(pthread_mutex_t));
