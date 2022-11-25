@@ -10,7 +10,7 @@ echo "nb philosophs,Mesure i,time" &> measure_philo.csv
 #for thread in "${THREADS[@]}"; do
   for nb_phil in "${THREADS[@]}"; do  #in NB_PHILOSOPHS ?
     for i in {1..5}; do
-      make philo -j "$thread" -s
+      make philo -j "$nb_phil" -s
       /usr/bin/time -f "$nb_phil,$i,%E" ./philo "$nb_phil" >>measure_philo.csv 2>&1                    # s = silent (do not print commands in terminal), j = number of jobs(threads)
       make -s clean
     done
