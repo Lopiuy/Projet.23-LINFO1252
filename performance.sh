@@ -24,7 +24,7 @@ for thread in "${THREADS[@]}"; do
   two=2
   c=$((thread / two))
   p=$((thread / two))
-  if [ $((thread%2)) != 0 ]; then
+  if [ $((thread%2)) != 0 ]; then    #comme que des thread pair, on pourrait le rerirer
     c=$((c+1))
   fi
     for i in {1..5}; do
