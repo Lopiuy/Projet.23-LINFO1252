@@ -13,8 +13,9 @@ int buf_out_index = 0;
 
 
 void* producer_func(void* arg){
-
-    for(int i = 0; i < 20; i++) { //8192
+    int* iter = (int*)arg;
+    //fprintf(stderr,"%d\n",*iter);
+    for(int i = 0; i < *iter; i++) {
         for (int j = 0; j < 10000; j++) {
         }
 
@@ -23,7 +24,7 @@ void* producer_func(void* arg){
 
         buffer[buf_in_index] = 2;
         buf_in_index = (buf_in_index + 1) % 8;
-        printf("%s\n","producing");
+        //printf("%s\n","producing");
 
         if (pthread_mutex_unlock(&buff_mutex)) {perror("Buffer mutex failed with error");exit(1);}
         if (sem_post(&sem_full)) {perror("sem_post failed with error");exit(1);}
@@ -33,14 +34,15 @@ void* producer_func(void* arg){
 }
 
 void* consumer_func(void* arg){
-
-    for(int i = 0; i < 20; i++){ //8192
+    int* iter = (int*)arg;
+    //fprintf(stderr,"%d\n",*iter);
+    for(int i = 0; i < *iter; i++){
         if(sem_wait(&sem_full)){perror("sem_wait failed with error"); exit(1);}
         if(pthread_mutex_lock(&buff_mutex)){perror("Buffer mutex failed with error"); exit(1);}
 
         buffer[buf_out_index] = 0;
         buf_out_index = (buf_out_index + 1) % 8;
-        printf("%s\n","consuming");
+        //printf("%s\n","consuming");
 
         if(pthread_mutex_unlock(&buff_mutex)){perror("Buffer mutex failed with error"); exit(1);}
         if(sem_post(&sem_empty)){perror("sem_post failed with error"); exit(1);}
@@ -83,9 +85,13 @@ int main(int argc, char * argv[]){
     pthread_t producers[nb_producers];
 
 
-
+    int iter = 8192/nb_consumers;
     for(int i = 0; i < nb_consumers; i++){
-        int* param = &i;
+        if(i == nb_consumers-1){
+            iter += 8192%nb_consumers;
+        }
+        int* param = (int*)malloc(sizeof(int));
+        memcpy(param,&iter,sizeof(int));
         if (pthread_create(&consumers[i], NULL, &consumer_func, (void *) param) != 0){
             perror("Creation of consumer thread failed.");
             exit(1);
@@ -93,8 +99,13 @@ int main(int argc, char * argv[]){
     }
 
 
+    iter = 8192/nb_producers;
     for(int i = 0; i < nb_producers; i++){
-        int* param = &i;
+        if(i == nb_producers-1){
+            iter += 8192%nb_producers;
+        }
+        int* param = (int*)malloc(sizeof(int));
+        memcpy(param,&iter,sizeof(int));
         if (pthread_create(&producers[i], NULL, &producer_func, (void *) param) != 0){
             perror("Creation of consumer thread failed.");
             exit(1);
