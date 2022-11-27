@@ -41,7 +41,7 @@ void* writer(void* arg)
 
         // write database
         for (int i = 0; i < 10000; i++);
-        printf("thread %d has written\n", *((args_t *) arg)->id);
+        //printf("thread %d has written\n", *((args_t *) arg)->id);
 
         sem_post(&wsem);
         pthread_mutex_lock(&mutex_writecount);
@@ -79,7 +79,7 @@ void* reader(void* arg)
 
         // read database
         for (int i = 0; i < 10000; i++);
-        printf("thread %d has read\n", *((args_t *) arg)->id);
+        //printf("thread %d has read\n", *((args_t *) arg)->id);
 
         pthread_mutex_lock(&mutex_readcount);
         readcount--;
