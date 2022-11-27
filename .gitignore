@@ -1,0 +1,13 @@
+# Executables
+*.exe
+*.out
+philo
+prodcons
+rw
+
+# Object files
+*.o
+
+# Output files
+*.txt
+*.vscode

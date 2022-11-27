@@ -11,7 +11,7 @@ echo "nb philosophs,Mesure i,time" &> measure_philo.csv
   for nb_phil in "${THREADS[@]}"; do  #in NB_PHILOSOPHS ?
     for i in {1..5}; do
       make philo -j "$nb_phil" -s
-      /usr/bin/time -f "$nb_phil,$i,%E" ./philo "$nb_phil" >>measure_philo.csv 2>&1                    # s = silent (do not print commands in terminal), j = number of jobs(threads)
+      /usr/bin/time -f "$nb_phil,$i,%e" ./philo "$nb_phil" >>measure_philo.csv 2>&1                    # s = silent (do not print commands in terminal), j = number of jobs(threads)
       make -s clean
     done
   done
@@ -29,7 +29,7 @@ for thread in "${THREADS[@]}"; do
   fi
     for i in {1..5}; do
       make prodcons -j "$thread" -s
-      /usr/bin/time -f "$c,$p,$thread,$i,%E" ./prodcons "$c" "$p" >>measure_prodcons.csv 2>&1                    # s = silent (do not print commands in terminal), j = number of jobs(threads)
+      /usr/bin/time -f "$c,$p,$thread,$i,%e" ./prodcons "$c" "$p" >>measure_prodcons.csv 2>&1                    # s = silent (do not print commands in terminal), j = number of jobs(threads)
       make -s clean
     done
 done
@@ -45,7 +45,7 @@ for thread in "${THREADS[@]}"; do
   fi
     for i in {1..5}; do
       make rw -j "$thread" -s
-      /usr/bin/time -f "$r,$w,$thread,$i,%E" ./rw "$r" "$w" >>measure_rw.csv 2>&1                    # s = silent (do not print commands in terminal), j = number of jobs(threads)
+      /usr/bin/time -f "$r,$w,$thread,$i,%e" ./rw "$r" "$w" >>measure_rw.csv 2>&1                    # s = silent (do not print commands in terminal), j = number of jobs(threads)
       make -s clean
     done
 done

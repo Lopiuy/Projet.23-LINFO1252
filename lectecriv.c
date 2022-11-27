@@ -6,8 +6,8 @@
 #include <stdbool.h>
 #include <errno.h>
 
-#define Nw 5 // total number of writings // to change -> 640 (x128)
-#define Nr 20 // total number of readings // to change -> 2560 (x128)
+#define Nw 640 // total number of writings // to change -> 640 (x128)
+#define Nr 2560 // total number of readings // to change -> 2560 (x128)
 
 pthread_mutex_t mutex_readcount; //Protège readcount
 pthread_mutex_t mutex_writecount; //Protège writecount
@@ -95,7 +95,7 @@ void* reader(void* arg)
 int main(int argc, char *argv[]){
 
     if (argc != 3){
-        fprintf(stderr, "Error: %s\n", "invalid arguments was given");
+        fprintf(stderr, "Error: %s\n", "Invalid arguments was given");
         exit(EXIT_FAILURE);
     }
 
