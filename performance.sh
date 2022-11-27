@@ -10,13 +10,8 @@ NB_PHILOSOPHS=(3 10 101 500)
 for thread in "${THREADS[@]}"; do
   for nb_phil in "${NB_PHILOSOPHS[@]}"; do  #in NB_PHILOSOPHS ?
     for i in {1..5}; do
-<<<<<<< HEAD
-      make philo -j "$nb_phil" -s
-      /usr/bin/time -f "$nb_phil,$i,%e" ./philo "$nb_phil" >>measure_philo.csv 2>&1                    # s = silent (do not print commands in terminal), j = number of jobs(threads)
-=======
       make philo -j "$thread" -s
-      /usr/bin/time -f "$nb_phil,$thread,$i,%E" ./philo "$nb_phil" >>measure_philo.csv 2>&1                    # s = silent (do not print commands in terminal), j = number of jobs(threads)
->>>>>>> 789bfc617a94a71b56d8d02f261d67b8438afa53
+      /usr/bin/time -f "$nb_phil,$thread,$i,%e" ./philo "$nb_phil" >>measure_philo.csv 2>&1                    # s = silent (do not print commands in terminal), j = number of jobs(threads)
       make -s clean
     done
   done
