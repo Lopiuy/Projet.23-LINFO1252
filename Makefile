@@ -18,7 +18,7 @@ all:
 	make rw
 
 clean:
-	rm -f src/*.o
+	rm -f *.o
 	rm -f philo
 	rm -f prodcons
 	rm -f rw
