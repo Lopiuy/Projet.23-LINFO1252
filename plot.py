@@ -47,10 +47,8 @@ def plot(data, threads, nthreads, problem=''):
     stds = np.std(y, axis=1)
 
     vp = ax.violinplot(y, showmeans=True)
-
     ax.scatter(np.arange(1, len(labels) + 1), means+stds, 125*np.ones(nthreads), marker='_', lw=1, color='saddlebrown', label="écarts-types")
-    ax.scatter(np.arange(1, len(labels) + 1), means-stds, 125*np.ones(nthreads), marker='_', lw=1, color='saddlebrown')
-
+    
     customization(ax, labels, y, vp, problem)
     plt.show()
 
