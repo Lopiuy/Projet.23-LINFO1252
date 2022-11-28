@@ -13,6 +13,7 @@ plot: plot.py
 	python3 plot.py measure_philo.csv 
 	python3 plot.py measure_prodcons.csv
 	python3 plot.py measure_rw.csv
+	python3 plot.py measure_tas.csv measure_ttas.csv
 
 testandset: tas.c
 	gcc -o tas -Wall tas.c
