@@ -9,6 +9,11 @@ prodcons: philosophe.c
 rw: philosophe.c
 	gcc -o rw -Wall lectecriv.c
 
+plot: plot.py
+	python3 plot.py measure_philo.csv 
+	python3 plot.py measure_prodcons.csv
+	python3 plot.py measure_rw.csv
+
 zip:
 	tar -zcvf prog.tar.gz philosphe.c rw.c prodcons.c Makefile README.md
 
