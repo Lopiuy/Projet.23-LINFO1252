@@ -1,0 +1,79 @@
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+
+#define N 6400
+
+int verrou = 0;
+
+void lock_tas(int *verrou) {
+    asm (
+    "enter:;"
+        "movl %1, %%eax;"
+        "xchg %%eax, %0;"
+        "testl %%eax, %%eax;"
+        "jnz enter;"
+    :"=m"(*verrou)
+    :"r"(1)
+    :"%eax");
+}
+
+void lock(int *verrou) {
+    while(*verrou == 1){} // optimization : does the verrou seem free ?
+    lock_tas(verrou);
+}
+
+void unlock(int *verrou) {
+    asm (
+    "movl %1, %%eax;"
+    "xchg %%eax, %0;"
+    :"=m"(*verrou)
+    :"r"(0) 
+    :"%eax");
+}
+
+void *func(void *param){
+    int stop = *((int *) param);
+    for (int i = 0; i < stop; i++) {
+        lock(&verrou);
+        // critical section
+        for (int i = 0; i < 10000; i++);
+        unlock(&verrou);
+    }
+    return NULL;
+}
+
+int main(int argc, char *argv[]){
+
+    if (argc != 2) {
+        fprintf(stderr, "Error: %s\n", "Invalid arguments was given");
+        exit(EXIT_FAILURE);
+    }
+
+    int nthreads = atoi(argv[1]);
+    pthread_t threads[nthreads];
+
+    for (int i = 0; i < nthreads ; i++) {
+
+        int p = N/nthreads;
+        if (i == nthreads - 1){p += N % nthreads;}
+        int *param = (int *) malloc(sizeof(int));
+        memcpy(param, &p, sizeof(int));
+
+        if (0 != pthread_create(&threads[i], NULL, &func, (void *) param)) {
+            fprintf(stderr, "Error: %s\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    for (int i = 0; i < nthreads ; i++) {
+        if (0 != pthread_join(threads[i], NULL)) {
+            fprintf(stderr, "Error: %s\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    return EXIT_SUCCESS;
+}
