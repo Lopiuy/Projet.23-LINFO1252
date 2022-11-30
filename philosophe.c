@@ -2,11 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
-#include <unistd.h>
 
 pthread_mutex_t* baguette_mutex;
 int nb_philosophs = 0;
+int nb_baguettes = 0;
 
 
 void eat(int id) {
@@ -23,7 +22,7 @@ void* philosophe(void* args){
     //fprintf(stderr,"%s\n","DEBUT");
     int *id = (int*)args;
     int left = *id;
-    int right = (left + 1) % nb_philosophs;
+    int right = (left + 1) % nb_baguettes;
     int i = 0;
     while(i < 100000){  //100000
         think(*id);
@@ -49,11 +48,14 @@ int main(int argc, char * argv[]){
         return -1;
     }
     nb_philosophs = atoi(argv[1]);
+    nb_baguettes = atoi(argv[1]);
+
+    if(nb_baguettes == 1){nb_baguettes++;}
 
     pthread_t phil[nb_philosophs];
-    baguette_mutex = (pthread_mutex_t*) malloc(nb_philosophs * sizeof(pthread_mutex_t));
+    baguette_mutex = (pthread_mutex_t*) malloc(nb_baguettes * sizeof(pthread_mutex_t));
 
-    for (int i = 0; i < nb_philosophs; i++) {
+    for (int i = 0; i < nb_baguettes; i++) {
         if(pthread_mutex_init(&baguette_mutex[i],NULL)){perror("Mutex initailisation failed with error"); exit(1);}
     }
 
@@ -71,7 +73,7 @@ int main(int argc, char * argv[]){
         }
     }
 
-    for (int i = 0; i < nb_philosophs; i++) {
+    for (int i = 0; i < nb_baguettes; i++) {
         if(pthread_mutex_destroy(&baguette_mutex[i])){perror("Mutex destroy failed with error"); exit(1);}
     }
 

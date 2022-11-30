@@ -3,10 +3,10 @@
 philo: philosophe.c
 	gcc -o philo -Wall philosophe.c
 
-prodcons: philosophe.c
+prodcons: prodcons.c
 	gcc -o prodcons -Wall prodcons.c
 
-rw: philosophe.c
+rw: lectecriv.c
 	gcc -o rw -Wall lectecriv.c
 
 plot: plot.py
