@@ -8,30 +8,27 @@
 
 int verrou = 0;
 
-void lock_tas(int *verrou) {
+int testAndSet(int* verrou,int a){
+    int ret;
     asm (
-    "enter:;"
-        "movl %1, %%eax;"
-        "xchg %%eax, %0;"
-        "testl %%eax, %%eax;"
-        "jnz enter;"
-    :"=m"(*verrou)
-    :"r"(1)
+        "movl %2, %%eax;"
+        "xchg %%eax, %1;"
+        "movl %%eax, %0"
+    :"=r"(ret), "=m"(*verrou)
+    :"r"(a)
     :"%eax");
+    return ret;
 }
 
-void lock(int *verrou) {
-    while(*verrou == 1){} // optimization : does the verrou seem free ?
-    lock_tas(verrou);
+void lock(int *verrou){
+    while (testAndSet(verrou,1)){
+        while(*verrou);
+    }
 }
+
 
 void unlock(int *verrou) {
-    asm (
-    "movl %1, %%eax;"
-    "xchg %%eax, %0;"
-    :"=m"(*verrou)
-    :"r"(0) 
-    :"%eax");
+    testAndSet(verrou,0);
 }
 
 void *func(void *param){
