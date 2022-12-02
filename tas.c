@@ -33,7 +33,7 @@ void *func(void *param){
     for (int i = 0; i < stop; i++) {
         lock(&verrou);
         // critical section
-        for (int i = 0; i < 10000; i++);
+        for (int j = 0; j < 10000; j++);
         unlock(&verrou);
     }
     return NULL;

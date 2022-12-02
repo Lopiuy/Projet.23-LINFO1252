@@ -26,6 +26,8 @@ def customization(ax, labels, y, vp, problem):
         title += " par l'algorithme test-and-set"
     elif problem == 'ttas':
         title += " par l'algorithme test-and-test-and-set"
+    elif problem == 'backoff':
+        title += " par l'algorithme backoff"
     ax.set_title(title, fontsize=14)
 
     # violon plots
@@ -138,6 +140,9 @@ if len(sys.argv) == 2:
 
         elif sys.argv[1].__contains__("ttas"):
             plot(toplot, threads, nthreads, problem='ttas')
+
+        elif sys.argv[1].__contains__("backoff"):
+            plot(toplot, threads, nthreads, problem='backoff')
 
         else:
             print("Error: Invalid arguments were given")

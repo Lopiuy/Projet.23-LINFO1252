@@ -21,6 +21,12 @@ testandset: tas.c
 testandtestandset: ttas.c
 	gcc -o ttas -Wall ttas.c
 
+backoff: backoff.c
+	gcc -o backoff -Wall backoff.c
+
+ttastest: ttastest.c
+	gcc -o ttastest -Wall ttastest.c
+
 zip:
 	tar -zcvf prog.tar.gz philosphe.c rw.c prodcons.c Makefile README.md
 
@@ -28,7 +34,10 @@ all:
 	make philo
 	make prodcons
 	make rw
-	make testset
+	make testandset
+	make testandtestandset
+	make backoff
+	make ttastest
 
 clean:
 	rm -f *.o
@@ -37,5 +46,7 @@ clean:
 	rm -f rw
 	rm -f tas
 	rm -f ttas
+	rm -f backoff
+	rm -f ttastest
 
 .PHONY: clean all

@@ -5,6 +5,8 @@
 #include <errno.h>
 
 #define N 6400
+int min = 1000000;
+int max = 0;
 
 int verrou = 0;
 
@@ -21,9 +23,14 @@ int testAndSet(int* verrou,int a){
 }
 
 void lock(int *verrou){
+    int i = 0;
     while (testAndSet(verrou,1)){
-        while(*verrou);
+        while(*verrou){
+        }
+        i++;
     }
+    if(i<min){min = i;}
+    if(i>max){max = i;}
 }
 
 
@@ -36,7 +43,7 @@ void *func(void *param){
     for (int i = 0; i < stop; i++) {
         lock(&verrou);
         // critical section
-        for (int j = 0; j < 10000; j++);
+        for (int i = 0; i < 10000; i++);
         unlock(&verrou);
     }
     return NULL;
@@ -71,6 +78,8 @@ int main(int argc, char *argv[]){
             exit(EXIT_FAILURE);
         }
     }
+    printf("%d,%d,",min,max);
+    printf("%d\n",nthreads);
 
     return EXIT_SUCCESS;
 }

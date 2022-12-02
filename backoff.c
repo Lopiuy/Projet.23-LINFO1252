@@ -5,24 +5,30 @@
 #include <errno.h>
 
 #define N 6400
+#define MAX 1000
 
 int verrou = 0;
 
 int testAndSet(int* verrou,int a){
     int ret;
     asm (
-        "movl %2, %%eax;"
-        "xchg %%eax, %1;"
-        "movl %%eax, %0"
-    :"=r"(ret), "=m"(*verrou)
-    :"r"(a)
-    :"%eax");
+            "movl %2, %%eax;"
+            "xchg %%eax, %1;"
+            "movl %%eax, %0"
+            :"=r"(ret), "=m"(*verrou)
+            :"r"(a)
+            :"%eax");
     return ret;
 }
 
-void lock(int *verrou){
+void lock(int *verrou,int init){
+    int wait = init;
     while (testAndSet(verrou,1)){
         while(*verrou);
+        for (int i = 0; i < wait; i++) {}
+        if(wait<MAX){
+            wait = 2*wait;
+        }
     }
 }
 
@@ -34,7 +40,7 @@ void unlock(int *verrou) {
 void *func(void *param){
     int stop = *((int *) param);
     for (int i = 0; i < stop; i++) {
-        lock(&verrou);
+        lock(&verrou,i%10);
         // critical section
         for (int j = 0; j < 10000; j++);
         unlock(&verrou);
