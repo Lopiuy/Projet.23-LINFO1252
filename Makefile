@@ -23,6 +23,8 @@ testandtestandset: src/ttas.c
 
 dummy: src/dummysem.c
 	gcc -o dummy src/dummysem.c src/mysem.c src/queue.c
+	./dummy
+	rm -f dummy
 
 backoff: src/backoff.c
 	gcc -o backoff -Wall src/backoff.c

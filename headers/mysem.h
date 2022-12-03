@@ -6,11 +6,11 @@
 typedef struct cond cond_t;
 struct cond {
     queue_t *q; // queue of sleeping threads
-    int *mx; // mutex to protect the queue
+    int mx; // mutex to protect the queue
 };
 
 typedef struct {
-    int *verrou; // = mutex
+    int verrou; // = mutex
     int value; // value of the semaphore
     int wakeup; // number of threads that can be woken up
     cond_t *cond; //condition variable to suspend threads

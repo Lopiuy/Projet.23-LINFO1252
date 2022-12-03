@@ -6,22 +6,22 @@
 #include "../headers/mysem.h"
 
 #define NTHREADS 2
-sem_t semaphore;
-//mysem_t *semaphore;
+//sem_t semaphore;
+mysem_t *sem;
 
 void *before(void * param) {
     // do something
     for(int j=0;j<1000000;j++) {
     }
     printf("first thread did his thing\n");
-    //mysem_post(semaphore);
-    sem_post(&semaphore);
+    mysem_post(sem);
+    //sem_post(&semaphore);
     return(NULL);
 }
 
 void *after(void * param) {
-    //mysem_wait(semaphore);
-    sem_wait(&semaphore);
+    mysem_wait(sem);
+    //sem_wait(&semaphore);
     // do something
     for(int j=0;j<1000000;j++) {
     }
@@ -30,27 +30,16 @@ void *after(void * param) {
 }
 
 int main (int argc, char *argv[])  {
-    printf("check point passed\n");
+
     pthread_t thread[NTHREADS];
     void * (* func[])(void *)={before, after};
     int err;
 
-    printf("check point passed\n");
-
-    //mysem_t *semaphore = mysem_init(0);
-
-    err=sem_init(&semaphore, 0,0);
+    /*err=sem_init(&semaphore, 0,0);
     if(err!=0) {
       fprintf(stderr,"sem_init");
-    }
-    mysem_t *sem = mysem_init(0);
-
-    printf("value : %d\n", sem->value);
-    printf("verrou : %d\n", *(sem->verrou));
-
-    //mysem_post(sem);
-
-    printf("check point passed\n");
+    }*/
+    sem = mysem_init(0);
 
     for(int i=0;i<NTHREADS;i++) {
         err=pthread_create(&(thread[i]),NULL,func[i],NULL);
@@ -66,9 +55,9 @@ int main (int argc, char *argv[])  {
         }
     }
 
-    err=sem_destroy(&semaphore);
+    /*err=sem_destroy(&semaphore);
     if(err!=0) {
       fprintf(stderr,"sem_destroy");
-    }
+    }*/
     return(EXIT_SUCCESS);
 }

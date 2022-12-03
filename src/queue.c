@@ -21,6 +21,7 @@ void enqueue(queue_t *q, int *id) {
         fprintf(stderr, "Error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
+    
     newNode->id = id;
     newNode->next = NULL;
     if (q->last != NULL) q->last->next = newNode;
