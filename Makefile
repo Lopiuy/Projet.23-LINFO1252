@@ -23,6 +23,7 @@ testandtestandset: ttas.c
 
 dummy: dummysem.c
 	gcc -o dummy dummysem.c mysem.c queue.c
+
 backoff: backoff.c
 	gcc -o backoff -Wall backoff.c
 
@@ -48,11 +49,8 @@ clean:
 	rm -f rw
 	rm -f tas
 	rm -f ttas
-<<<<<<< HEAD
 	rm -f dummy
-=======
 	rm -f backoff
 	rm -f ttastest
->>>>>>> bb2b74659da399063832e0c75a297ea302e985c3
 
 .PHONY: clean all
