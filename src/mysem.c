@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "mysem.h"
+#include "../headers/mysem.h"
 
 int testAndSet(int* verrou,int a){
     int ret;

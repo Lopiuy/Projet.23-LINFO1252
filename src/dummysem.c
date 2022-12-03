@@ -3,7 +3,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include "mysem.h"
+#include "../headers/mysem.h"
 
 #define NTHREADS 2
 sem_t semaphore;
@@ -48,7 +48,7 @@ int main (int argc, char *argv[])  {
     printf("value : %d\n", sem->value);
     printf("verrou : %d\n", *(sem->verrou));
 
-    mysem_post(sem);
+    //mysem_post(sem);
 
     printf("check point passed\n");
 

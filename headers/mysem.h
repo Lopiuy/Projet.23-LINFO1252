@@ -1,7 +1,7 @@
 #ifndef SEM_H
 #define SEM_H
 
-#include "queue.h"
+#include "../headers/queue.h"
 
 typedef struct cond cond_t;
 struct cond {

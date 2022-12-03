@@ -1,34 +1,34 @@
 
 
-philo: philosophe.c
-	gcc -o philo -Wall philosophe.c
+philo: src/philosophe.c
+	gcc -o philo -Wall src/philosophe.c
 
-prodcons: prodcons.c
-	gcc -o prodcons -Wall prodcons.c
+prodcons: src/prodcons.c
+	gcc -o prodcons -Wall src/prodcons.c
 
-rw: lectecriv.c
-	gcc -o rw -Wall lectecriv.c
+rw: src/lectecriv.c
+	gcc -o rw -Wall src/lectecriv.c
 
 plot: plot.py
-	python3 plot.py measure_philo.csv 
-	python3 plot.py measure_prodcons.csv
-	python3 plot.py measure_rw.csv
-	python3 plot.py measure_tas.csv measure_ttas.csv
+	python3 plot.py measures/measure_philo.csv 
+	python3 plot.py measures/measure_prodcons.csv
+	python3 plot.py measures/measure_rw.csv
+	python3 plot.py measures/measure_tas.csv measures/measure_ttas.csv
 
-testandset: tas.c
-	gcc -o tas -Wall tas.c
+testandset: src/tas.c
+	gcc -o tas -Wall src/tas.c
 
-testandtestandset: ttas.c
-	gcc -o ttas -Wall ttas.c
+testandtestandset: src/ttas.c
+	gcc -o ttas -Wall src/ttas.c
 
-dummy: dummysem.c
-	gcc -o dummy dummysem.c mysem.c queue.c
+dummy: src/dummysem.c
+	gcc -o dummy src/dummysem.c src/mysem.c src/queue.c
 
-backoff: backoff.c
-	gcc -o backoff -Wall backoff.c
+backoff: src/backoff.c
+	gcc -o backoff -Wall src/backoff.c
 
-ttastest: ttastest.c
-	gcc -o ttastest -Wall ttastest.c
+ttastest: src/ttastest.c
+	gcc -o ttastest -Wall src/ttastest.c
 
 zip:
 	tar -zcvf prog.tar.gz philosphe.c rw.c prodcons.c Makefile README.md
