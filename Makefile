@@ -1,5 +1,16 @@
 
 
+all:
+	#make philo
+	#make prodcons
+	#make rw
+	#make testandset
+	#make testandtestandset
+	#make backoff
+	#make ttastest
+	make scripts
+	make plot
+
 philo: src/philosophe.c
 	gcc -o philo -Wall src/philosophe.c
 
@@ -26,6 +37,24 @@ dummy: src/dummysem.c
 	./dummy
 	rm -f dummy
 
+philotas: src/philotas.c
+	gcc -o philotas -Wall src/philotas.c
+
+philottas: src/philottas.c
+	gcc -o philottas -Wall src/philottas.c
+
+prodconstas: src/prodconstas.c
+	gcc -o prodconstas -Wall src/prodconstas.c
+
+prodconsttas: src/prodconsttas.c
+	gcc -o prodconsttas -Wall src/prodconsttas.c
+
+rwtas: src/lectecrivtas.c
+	gcc -o rwtas -Wall src/lectecrivtas.c
+
+rwttas: src/lectecrivttas.c
+	gcc -o rwttas -Wall src/lectecrivttas.c
+
 backoff: src/backoff.c
 	gcc -o backoff -Wall src/backoff.c
 
@@ -35,14 +64,8 @@ ttastest: src/ttastest.c
 zip:
 	tar -zcvf prog.tar.gz philosphe.c rw.c prodcons.c Makefile README.md
 
-all:
-	make philo
-	make prodcons
-	make rw
-	make testandset
-	make testandtestandset
-	make backoff
-	make ttastest
+scripts: experiments.sh
+	./experiments.sh
 
 clean:
 	rm -f *.o
@@ -52,6 +75,8 @@ clean:
 	rm -f tas
 	rm -f ttas
 	rm -f dummy
+	rm -f philotas
+	rm -f philottas
 	rm -f backoff
 	rm -f ttastest
 

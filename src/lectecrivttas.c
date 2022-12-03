@@ -4,13 +4,15 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <errno.h>
+#include "../headers/myttasmutex.h"
+
 
 #define Nw 640 // total number of writings // to change -> 640 (x128)
 #define Nr 2560 // total number of readings // to change -> 2560 (x128)
 
-pthread_mutex_t mutex_readcount; //Protège readcount
-pthread_mutex_t mutex_writecount; //Protège writecount
-pthread_mutex_t z;
+int mutex_readcount = 0; //Protège readcount
+int mutex_writecount = 0; //Protège writecount
+int z = 0;
 
 sem_t wsem; //Accès exclusif à la db
 sem_t rsem; //Pour bloquer des readers
@@ -29,13 +31,13 @@ void* writer(void* arg)
     // int *stop = (int *) arg;
     for (int i = 0; i < *((args_t *) arg)->stop; i++) // to change
     {
-        pthread_mutex_lock(&mutex_writecount);
+        lock(&mutex_writecount);
         writecount++;
         if (writecount==1)
         {
             sem_wait(&rsem);
         }
-        pthread_mutex_unlock(&mutex_writecount);
+        unlock(&mutex_writecount);
         sem_wait(&wsem);
 
         // write database
@@ -43,13 +45,13 @@ void* writer(void* arg)
         //printf("thread %d has written\n", *((args_t *) arg)->id);
 
         sem_post(&wsem);
-        pthread_mutex_lock(&mutex_writecount);
+        lock(&mutex_writecount);
         writecount--;
         if(writecount==0)
         {
             sem_post(&rsem);
         }
-        pthread_mutex_unlock(&mutex_writecount);
+        unlock(&mutex_writecount);
     }
     return NULL;
 }
@@ -59,19 +61,19 @@ void* reader(void* arg)
     // int *stop = (int *) arg;
     for (int i = 0; i < *((args_t *) arg)->stop; i++) // to change
     {
-        pthread_mutex_lock(&z);
+        lock(&z);
 
         sem_wait(&rsem); //un seul reader à la fois
-        pthread_mutex_lock(&mutex_readcount);
+        lock(&mutex_readcount);
         readcount++;
         if (readcount==1)
         {
             sem_wait(&wsem);
         }
-        pthread_mutex_unlock(&mutex_readcount);
+        unlock(&mutex_readcount);
         sem_post(&rsem); //libération du prochain reader
 
-        pthread_mutex_unlock(&z); //si on a un 2ème reader et un writer qui attende wsem (sem_wait(&rsem)),
+        unlock(&z); //si on a un 2ème reader et un writer qui attende wsem (sem_wait(&rsem)),
         // il faut donner la priorité au writer. En faisant ceci, on empêche qu'un 2ème
         // reader attende (vu qu'il doit attendre que z est unlock, et le post rsem est fait
         // avant l'unlock -> writer va être libéré avant)
@@ -80,13 +82,13 @@ void* reader(void* arg)
         for (int i = 0; i < 10000; i++);
         //printf("thread %d has read\n", *((args_t *) arg)->id);
 
-        pthread_mutex_lock(&mutex_readcount);
+        lock(&mutex_readcount);
         readcount--;
         if(readcount==0)
         {
             sem_post(&wsem);
         }
-        pthread_mutex_unlock(&mutex_readcount);
+        unlock(&mutex_readcount);
     }
     return NULL;
 }
@@ -103,11 +105,6 @@ int main(int argc, char *argv[]){
 
     pthread_t writers[nwriters];
     pthread_t readers[nreaders];
-
-    if (pthread_mutex_init(&mutex_readcount, NULL) || pthread_mutex_init(&mutex_writecount, NULL) || pthread_mutex_init(&z, NULL)){
-        fprintf(stderr, "Error: %s\n", strerror(errno));
-        exit(EXIT_FAILURE);
-    }
 
     if (sem_init(&wsem,0,1) == -1 || sem_init(&rsem,0,1) == -1) {
         fprintf(stderr, "Error: %s\n", strerror(errno));
@@ -167,11 +164,6 @@ int main(int argc, char *argv[]){
             fprintf(stderr, "Error: %s\n", strerror(errno));
             exit(EXIT_FAILURE);
         }
-    }
-
-    if (pthread_mutex_destroy(&mutex_readcount) || pthread_mutex_destroy(&mutex_writecount) || pthread_mutex_destroy(&z) || sem_destroy(&rsem) || sem_destroy(&wsem)){
-        fprintf(stderr, "Error: %s\n", strerror(errno));
-        exit(EXIT_FAILURE);
     }
 
     return EXIT_SUCCESS;
