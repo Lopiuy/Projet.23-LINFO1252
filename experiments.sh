@@ -7,3 +7,4 @@
 ./scripts/performancebackoff.sh
 ./scripts/performanceTasProblems.sh
 ./scripts/performanceTtasProblems.sh
+make plot

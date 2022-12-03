@@ -1,15 +1,15 @@
 
 
-all:
-	#make philo
-	#make prodcons
-	#make rw
-	#make testandset
-	#make testandtestandset
-	#make backoff
-	#make ttastest
-	make scripts
-	make plot
+#all:
+#	make philo
+#	make prodcons
+#	make rw
+#	make testandset
+#	make testandtestandset
+#	make backoff
+#	make ttastest
+#	make scripts
+#	make plot
 
 philo: src/philosophe.c
 	gcc -o philo -Wall src/philosophe.c
