@@ -21,6 +21,9 @@ testandset: tas.c
 testandtestandset: ttas.c
 	gcc -o ttas -Wall ttas.c
 
+dummy: dummysem.c
+	gcc -o dummy dummysem.c mysem.c queue.c
+
 zip:
 	tar -zcvf prog.tar.gz philosphe.c rw.c prodcons.c Makefile README.md
 
@@ -37,5 +40,6 @@ clean:
 	rm -f rw
 	rm -f tas
 	rm -f ttas
+	rm -f dummy
 
 .PHONY: clean all
