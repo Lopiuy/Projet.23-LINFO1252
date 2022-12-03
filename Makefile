@@ -3,10 +3,10 @@
 philo: philosophe.c
 	gcc -o philo -Wall philosophe.c
 
-prodcons: philosophe.c
+prodcons: prodcons.c
 	gcc -o prodcons -Wall prodcons.c
 
-rw: philosophe.c
+rw: lectecriv.c
 	gcc -o rw -Wall lectecriv.c
 
 plot: plot.py
@@ -23,6 +23,11 @@ testandtestandset: ttas.c
 
 dummy: dummysem.c
 	gcc -o dummy dummysem.c mysem.c queue.c
+backoff: backoff.c
+	gcc -o backoff -Wall backoff.c
+
+ttastest: ttastest.c
+	gcc -o ttastest -Wall ttastest.c
 
 zip:
 	tar -zcvf prog.tar.gz philosphe.c rw.c prodcons.c Makefile README.md
@@ -31,7 +36,10 @@ all:
 	make philo
 	make prodcons
 	make rw
-	make testset
+	make testandset
+	make testandtestandset
+	make backoff
+	make ttastest
 
 clean:
 	rm -f *.o
@@ -40,6 +48,11 @@ clean:
 	rm -f rw
 	rm -f tas
 	rm -f ttas
+<<<<<<< HEAD
 	rm -f dummy
+=======
+	rm -f backoff
+	rm -f ttastest
+>>>>>>> bb2b74659da399063832e0c75a297ea302e985c3
 
 .PHONY: clean all
