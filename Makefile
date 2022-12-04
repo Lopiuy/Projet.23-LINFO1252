@@ -77,6 +77,10 @@ clean:
 	rm -f dummy
 	rm -f philotas
 	rm -f philottas
+	rm -f prodconstas
+	rm -f prodconsttas
+	rm -f rwtas
+	rm -f rwttas
 	rm -f backoff
 	rm -f ttastest
 
