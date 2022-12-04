@@ -49,10 +49,11 @@ void* consumer_func(void* arg){
     for(int i = 0; i < *iter; i++){
         if(sem_wait(&sem_full)){
             perror("sem_wait failed with error");
-            exit(1);
+            exit(-1);
         }
-        if(pthread_mutex_lock(&buff_mutex)){perror("Buffer mutex failed with error");
-            exit(1);
+        if(pthread_mutex_lock(&buff_mutex)){
+            perror("Buffer mutex failed with error");
+            exit(-1);
         }
 
         buffer[buf_out_index] = 0;
@@ -60,11 +61,11 @@ void* consumer_func(void* arg){
 
         if(pthread_mutex_unlock(&buff_mutex)){
             perror("Buffer mutex failed with error");
-            exit(1);
+            exit(-1);
         }
         if(sem_post(&sem_empty)){
             perror("sem_post failed with error");
-            exit(1);
+            exit(-1);
         }
 
         for(int j = 0; j < 10000; j++){                     //simulate consumption
@@ -77,7 +78,6 @@ void* consumer_func(void* arg){
 
 int main(int argc, char * argv[]){
 
-    //ptet faire des nb de threads par default??
     if(argc < 3){
         perror("Please enter number of consumer threads and producer threads");
         return -1;

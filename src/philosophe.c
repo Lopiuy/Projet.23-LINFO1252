@@ -24,15 +24,33 @@ void* philosopher(void* args){
     while(i < 100000){                      //each philosopher does 100000 thinking-eating cycles
         think(*id);
         if(left<right){
-            pthread_mutex_lock(&sticks_mutex[left]);
-            pthread_mutex_lock(&sticks_mutex[right]);
+            if(pthread_mutex_lock(&sticks_mutex[left])){
+                perror("left stick mutex failed with error");
+                exit(-1);
+            }
+            if(pthread_mutex_lock(&sticks_mutex[right])){
+                perror("right stick mutex failed with error");
+                exit(-1);
+            }
         }else{
-            pthread_mutex_lock(&sticks_mutex[right]);
-            pthread_mutex_lock(&sticks_mutex[left]);
+            if(pthread_mutex_lock(&sticks_mutex[right])){
+                perror("right stick mutex failed with error");
+                exit(-1);
+            }
+            if(pthread_mutex_lock(&sticks_mutex[left])){
+                perror("left stick mutex failed with error");
+                exit(-1);
+            }
         }
         eat(*id);
-        pthread_mutex_unlock(&sticks_mutex[left]);
-        pthread_mutex_unlock(&sticks_mutex[right]);
+        if(pthread_mutex_unlock(&sticks_mutex[left])){
+            perror("left stick mutex failed with error");
+            exit(-1);
+        }
+        if(pthread_mutex_unlock(&sticks_mutex[right])){
+            perror("right stick mutex failed with error");
+            exit(-1);
+        }
         i++;
     }
     free(id);
