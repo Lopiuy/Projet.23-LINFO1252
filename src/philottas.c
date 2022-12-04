@@ -36,6 +36,7 @@ void* philosopher(void* args){
         unlock(&sticks_mutex[right]);
         i++;
     }
+    free(id);
     return (NULL);
 }
 
@@ -56,6 +57,10 @@ int main(int argc, char * argv[]){
 
     for(int i = 0; i < nb_philosophers; i++){           //launching philosophers
         int* id = (int*)malloc(sizeof(int));
+        if(id == NULL){
+            perror("Mutexes malloc failed with error");
+            return -1;
+        }
         memcpy(id,&i,sizeof(int));
         if (pthread_create(&philosophers[i], NULL, &philosopher, (void *) id) != 0){
             perror("Creation of philosopher thread failed.");
@@ -69,5 +74,7 @@ int main(int argc, char * argv[]){
             return -1;
         }
     }
+    free(sticks_mutex);
+    return 0;
 
 }
