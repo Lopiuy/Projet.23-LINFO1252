@@ -1,7 +1,6 @@
 run = gcc -o $@ -Wall $^
 
-all: ./experiments.sh
-	./experiments.sh
+all:
 	make plot
 
 philo: src/BaseProblems/philosophe.c
@@ -58,7 +57,7 @@ ttastest: src/ttastest.c
 	$(run)
 
 zip:
-	tar -zcvf Projet23-LINFO1252.tar.gz src scripts measures headers plot.py experiments.sh Makefile README.md
+	zip -r Projet23-LINFO1252.zip src scripts measures headers plot.py experiments.sh Makefile README.md
 
 scripts: experiments.sh
 	./experiments.sh
