@@ -56,13 +56,13 @@ rwttas: src/lectecrivttas.c
 	gcc -o rwttas -Wall src/lectecrivttas.c src/mysemttas.c src/queue.c src/myttasmutex.c
 
 backoff: src/backoff.c
-	gcc -o backoff -Wall src/backoff.c
+	gcc -o backoff -Wall src/backoff.c src/mybackoffmutex.c
 
 ttastest: src/ttastest.c
 	gcc -o ttastest -Wall src/ttastest.c
 
 zip:
-	tar -zcvf prog.tar.gz philosphe.c rw.c prodcons.c Makefile README.md
+	tar -zcvf Projet23-LINFO1252.tar.gz src scripts measures headers plot.py experiments.sh Makefile README.md
 
 scripts: experiments.sh
 	./experiments.sh
