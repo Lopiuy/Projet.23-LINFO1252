@@ -6,7 +6,6 @@
 #include "../headers/mysem.h"
 
 #define NTHREADS 2
-//sem_t semaphore;
 mysem_t *sem;
 
 void *before(void * param) {
@@ -15,13 +14,11 @@ void *before(void * param) {
     }
     printf("first thread did his thing\n");
     mysem_post(sem);
-    //sem_post(&semaphore);
     return(NULL);
 }
 
 void *after(void * param) {
     mysem_wait(sem);
-    //sem_wait(&semaphore);
     // do something
     for(int j=0;j<1000000;j++) {
     }
@@ -35,11 +32,10 @@ int main (int argc, char *argv[])  {
     void * (* func[])(void *)={before, after};
     int err;
 
-    /*err=sem_init(&semaphore, 0,0);
-    if(err!=0) {
-      fprintf(stderr,"sem_init");
-    }*/
     sem = mysem_init(0);
+    if (sem == NULL) {
+        fprintf(stderr, "sem_init");
+    }
 
     for(int i=0;i<NTHREADS;i++) {
         err=pthread_create(&(thread[i]),NULL,func[i],NULL);
@@ -55,9 +51,9 @@ int main (int argc, char *argv[])  {
         }
     }
 
-    /*err=sem_destroy(&semaphore);
+    err=mysem_destroy(sem);
     if(err!=0) {
       fprintf(stderr,"sem_destroy");
-    }*/
+    }
     return(EXIT_SUCCESS);
 }

@@ -32,4 +32,6 @@ void mysem_wait(mysem_t *semaphore);
 
 void mysem_post(mysem_t *semaphore);
 
+int mysem_destroy(mysem_t *semaphore);
+
 #endif

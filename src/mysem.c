@@ -30,11 +30,19 @@ void unlock(int *verrou) {
 cond_t *cond_init(void) {
 
     cond_t *cond = (cond_t *) malloc(sizeof(cond_t));
+    if (cond == NULL) {
+        errno = ENOMEM;
+        return NULL;
+    }
 
     int v = 0;
     cond->mx = v;
 
     queue_t *q = (queue_t *) malloc(sizeof(queue_t));
+    if (q == NULL) {
+        errno = ENOMEM;
+        return NULL;
+    }
     q->first = NULL;
     q->last = NULL;
     cond->q = q;
@@ -71,6 +79,10 @@ void cond_signal(cond_t *cv) {
 mysem_t *mysem_init(int value) {
 
     mysem_t *semaphore = (mysem_t *) malloc(sizeof(mysem_t));
+    if (semaphore == NULL) {
+        errno = ENOMEM;
+        return NULL;
+    }
     semaphore->value = value;
     semaphore->wakeup = 0;
 
@@ -78,6 +90,9 @@ mysem_t *mysem_init(int value) {
     semaphore->verrou = v;
 
     cond_t *cond = cond_init();
+    if (cond == NULL) {
+        return NULL;
+    }
     semaphore->cond = cond;
 
     return semaphore;
@@ -106,5 +121,38 @@ void mysem_post(mysem_t *semaphore) {
         cond_signal(semaphore->cond);
     }
     unlock(&(semaphore->verrou));
+}
+
+int mysem_destroy(mysem_t *semaphore) {
+
+    int err;
+    if (semaphore == NULL) {
+        err = EINVAL;
+    } else {
+        if (semaphore->value < 0) {
+            unlock(&(semaphore->verrou));
+            err = EBUSY;
+        } else {
+            if (semaphore->cond == NULL) {
+                free(semaphore);
+                err = EINVAL;
+            } else {
+                if (semaphore->cond->q == NULL) {
+                    free(semaphore->cond);
+                    free(semaphore);
+                    err = EINVAL;
+                } else {
+                    free(semaphore->cond->q);
+                    free(semaphore->cond);
+                    free(semaphore);
+                    err = 0;
+                }
+            }
+        }
+    }
+    if (err != 0) {
+        errno = err;
+    }
+    return err;
 }
 
