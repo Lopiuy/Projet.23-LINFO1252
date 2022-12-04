@@ -204,6 +204,7 @@ if __name__ == "__main__":
         csv1 = pd.read_csv(args.file_csv)
     except:
         print("Error: Cannot open csv file")
+        quit()
     threads1 = sorted(list(set(csv1['nb threads'])))
     toplot1 = [list(csv1[csv1['nb threads'] == i]['time']) for i in threads1]
     prob1 = problem_matcher(args.file_csv)
@@ -212,6 +213,7 @@ if __name__ == "__main__":
             csv2 = pd.read_csv(args.dual_plot)
         except:
            print("Error: Cannot open csv file") 
+           quit()
         # do dual plot
         threads2 = sorted(list(set(csv2['nb threads'])))
         toplot2 = [list(csv2[csv2['nb threads'] == i]['time']) for i in threads2]
@@ -227,13 +229,14 @@ if __name__ == "__main__":
     elif (args.merged_plot is not None):
         try:
             csv3 = pd.read_csv(args.merged_plot)
-            
         except:
-           print("Error: Cannot open csv file")  
+           print("Error: Cannot open csv file") 
+           quit() 
         # do merged plot
         threads3 = sorted(list(set(csv3['nb threads'])))
         if threads1 != threads3:
             print("Error: Number of threads must be the same")
+            quit()
         else:
             toplot3 = [list(csv3[csv3['nb threads'] == i]['time']) for i in threads3]
             prob3 = problem_matcher(args.merged_plot)

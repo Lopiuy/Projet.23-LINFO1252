@@ -17,7 +17,10 @@ plot: plot.py measures
 	python3 plot.py measures/measure_philo.csv 
 	python3 plot.py measures/measure_prodcons.csv
 	python3 plot.py measures/measure_rw.csv
-	python3 plot.py measures/measure_tas.csv measures/measure_ttas.csv
+	python3 plot.py measures/measure_tas.csv -d measures/measure_ttas.csv
+	python3 plot.py measures/measure_philo.csv -m measures/measure_philottas.csv
+	python3 plot.py measures/measure_prodcons.csv -m measures/measure_prodconsttas.csv
+	python3 plot.py measures/measure_rw.csv -m measures/measure_rwttas.csv
 
 tas: src/tas.c src/MyMutex/mytasmutex.c
 	$(run)
