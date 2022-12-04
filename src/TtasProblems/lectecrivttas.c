@@ -5,6 +5,7 @@
 #include <semaphore.h>
 #include <errno.h>
 #include "../../headers/myttasmutex.h"
+#include "../../headers/mysemttas.h"
 
 
 #define Nw 640 // total number of writings // to change -> 640 (x128)
@@ -14,8 +15,8 @@ int mutex_readcount = 0; //Protège readcount
 int mutex_writecount = 0; //Protège writecount
 int z = 0;
 
-sem_t wsem; //Accès exclusif à la db
-sem_t rsem; //Pour bloquer des readers
+mysem_t* wsem; //Accès exclusif à la db
+mysem_t* rsem; //Pour bloquer des readers
 
 int readcount = 0;
 int writecount = 0;
@@ -35,20 +36,20 @@ void* writer(void* arg)
         writecount++;
         if (writecount==1)
         {
-            sem_wait(&rsem);
+            mysem_wait(rsem);
         }
         unlock(&mutex_writecount);
-        sem_wait(&wsem);
+        mysem_wait(wsem);
 
         // write database
         for (int i = 0; i < 10000; i++);
 
-        sem_post(&wsem);
+        mysem_post(wsem);
         lock(&mutex_writecount);
         writecount--;
         if(writecount==0)
         {
-            sem_post(&rsem);
+            mysem_post(rsem);
         }
         unlock(&mutex_writecount);
     }
@@ -63,15 +64,15 @@ void* reader(void* arg)
     {
         lock(&z);
 
-        sem_wait(&rsem); //un seul reader à la fois
+        mysem_wait(rsem); //un seul reader à la fois
         lock(&mutex_readcount);
         readcount++;
         if (readcount==1)
         {
-            sem_wait(&wsem);
+            mysem_wait(wsem);
         }
         unlock(&mutex_readcount);
-        sem_post(&rsem); //libération du prochain reader
+        mysem_post(rsem); //libération du prochain reader
 
         unlock(&z); //si on a un 2ème reader et un writer qui attende wsem (sem_wait(&rsem)),
         // il faut donner la priorité au writer. En faisant ceci, on empêche qu'un 2ème
@@ -85,7 +86,7 @@ void* reader(void* arg)
         readcount--;
         if(readcount==0)
         {
-            sem_post(&wsem);
+            mysem_post(wsem);
         }
         unlock(&mutex_readcount);
     }
@@ -95,9 +96,9 @@ void* reader(void* arg)
 
 int main(int argc, char *argv[]){
 
-    if (argc != 3){
-        fprintf(stderr, "Error: %s\n", "Invalid arguments was given");
-        exit(EXIT_FAILURE);
+    if (argc < 3){
+        perror("Invalid arguments was given");
+        return -1;
     }
 
     int nwriters = atoi(argv[1]);
@@ -106,9 +107,15 @@ int main(int argc, char *argv[]){
     pthread_t writers[nwriters];
     pthread_t readers[nreaders];
 
-    if (sem_init(&wsem,0,1) == -1 || sem_init(&rsem,0,1) == -1) {
-        fprintf(stderr, "Error: %s\n", strerror(errno));
-        exit(EXIT_FAILURE);
+    wsem = mysem_init(1);
+    if(wsem == NULL){
+        perror("sem init of wsem failed with error");
+        return -1;
+    }
+    rsem = mysem_init(1);
+    if(rsem == NULL){
+        perror("sem init of rsem failed with error");
+        return -1;
     }
 
     for (int i = 0; i < nwriters; i++) {
@@ -118,9 +125,9 @@ int main(int argc, char *argv[]){
         int *param = (int *) malloc(sizeof(int));
         memcpy(param, &p, sizeof(int));
 
-        if (pthread_create(&writers[i], NULL, &writer, (void *) param) != 0){ // to change
-            fprintf(stderr, "Error: %s\n", strerror(errno));
-            exit(EXIT_FAILURE);
+        if (pthread_create(&writers[i], NULL, &writer, (void *) param) != 0){
+            perror("Writer thread creation failed");
+            return -1;
         }
     }
 
@@ -132,24 +139,36 @@ int main(int argc, char *argv[]){
         memcpy(param, &p, sizeof(int));
 
         if (pthread_create(&readers[i], NULL, &reader, (void *) param) != 0){
-            fprintf(stderr, "Error: %s\n", strerror(errno));
-            exit(EXIT_FAILURE);
+            perror("Reader thread creation failed");
+            return -1;
         }
     }
     
     for (int i = 0; i < nwriters; i++) {
         if (pthread_join(writers[i], NULL) != 0){
-            fprintf(stderr, "Error: %s\n", strerror(errno));
-            exit(EXIT_FAILURE);
+            perror("Writer thread join failed");
+            return -1;
         }
     }
 
     for (int i = 0; i < nreaders; i++) {
         if (pthread_join(readers[i], NULL) != 0) {
-            fprintf(stderr, "Error: %s\n", strerror(errno));
-            exit(EXIT_FAILURE);
+            perror("Reader thread join failed");
+            return -1;
         }
+        }
+
+    int err = mysem_destroy(wsem);
+    if(err != 0){
+        perror("Semaphore wsem destroy failed with error");
+        return -1;
     }
+    err = mysem_destroy(rsem);
+    if(err != 0){
+        perror("Semaphore rsem destroy failed with error");
+        return -1;
+    }
+
 
     return EXIT_SUCCESS;
 }
