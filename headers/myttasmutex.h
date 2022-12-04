@@ -23,7 +23,6 @@ void lock(int *verrou){
 void unlock(int *verrou) {
     testAndSet(verrou,0);
 }
-}
 
 
 #endif //MYTTASMUTEX_H
