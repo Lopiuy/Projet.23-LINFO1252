@@ -1,7 +1,22 @@
-run = gcc -o $@ -Wall $^
+run = gcc -o $@ -Wall $^  -lpthread
+
+forSubmition:
+
 
 all:
-	make plot
+	make philo
+	make prodcons
+	make rw
+	make tas
+	make ttas
+	make philotas
+	make philottas
+	make prodconstas
+	make prodconsttas
+	make rwtas
+	make rwttas
+	make backoff
+	make clean
 
 philo: src/BaseProblems/philosophe.c
 	$(run)
