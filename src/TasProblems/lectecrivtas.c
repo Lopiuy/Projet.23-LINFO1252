@@ -4,8 +4,8 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <errno.h>
-#include "../headers/mytasmutex.h"
-#include "../headers/mysemtas.h"
+#include "../../headers/mytasmutex.h"
+#include "../../headers/mysemtas.h"
 
 
 #define Nw 640 // total number of writings // to change -> 640 (x128)

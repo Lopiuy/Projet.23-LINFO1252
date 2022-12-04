@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../headers/myttasmutex.h"
-#include "../headers/mysemttas.h"
+#include "../../headers/mytasmutex.h"
+#include "../../headers/mysemtas.h"
 
 int* buffer;
 int buff_mutex = 0;

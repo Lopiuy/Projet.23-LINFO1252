@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "../headers/mysemtas.h"
+#include "../../headers/mysemtas.h"
 
 cond_t *cond_init(void) {
 

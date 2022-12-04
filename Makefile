@@ -2,15 +2,16 @@
 
 all:
 	./experiments.sh
+	make plot
 
-philo: src/philosophe.c
-	gcc -o philo -Wall src/philosophe.c
+philo: src/BaseProblems/philosophe.c
+	gcc -o philo -Wall src/BaseProblems/philosophe.c
 
-prodcons: src/prodcons.c
-	gcc -o prodcons -Wall src/prodcons.c
+prodcons: src/BaseProblems/prodcons.c
+	gcc -o prodcons -Wall src/BaseProblems/prodcons.c
 
-rw: src/lectecriv.c
-	gcc -o rw -Wall src/lectecriv.c
+rw: src/BaseProblems/lectecriv.c
+	gcc -o rw -Wall src/BaseProblems/lectecriv.c
 
 plot: plot.py
 	python3 plot.py measures/measure_philo.csv 
@@ -19,36 +20,36 @@ plot: plot.py
 	python3 plot.py measures/measure_tas.csv measures/measure_ttas.csv
 
 testandset: src/tas.c
-	gcc -o tas -Wall src/tas.c src/mytasmutex.c
+	gcc -o tas -Wall src/tas.c src/MyMutex/mytasmutex.c
 
 testandtestandset: src/ttas.c
-	gcc -o ttas -Wall src/ttas.c src/myttasmutex.c
+	gcc -o ttas -Wall src/ttas.c src/MyMutex/myttasmutex.c
 
 dummy: src/dummysem.c
-	gcc -o dummy src/dummysem.c src/mysemttas.c src/queue.c src/myttasmutex.c
+	gcc -o dummy src/dummysem.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/myttasmutex.c
 	./dummy
 	rm -f dummy
 
-philotas: src/philotas.c
-	gcc -o philotas -Wall src/philotas.c src/mytasmutex.c
+philotas: src/TasProblems/philotas.c
+	gcc -o philotas -Wall src/TasProblems/philotas.c src/MyMutex/mytasmutex.c
 
-philottas: src/philottas.c
-	gcc -o philottas -Wall src/philottas.c src/myttasmutex.c
+philottas: src/TtasProblems/philottas.c
+	gcc -o philottas -Wall src/TtasProblems/philottas.c src/MyMutex/myttasmutex.c
 
-prodconstas: src/prodconstas.c
-	gcc -o prodconstas -Wall src/prodconstas.c src/mysemttas.c src/queue.c src/mytasmutex.c
+prodconstas: src/TasProblems/prodconstas.c
+	gcc -o prodconstas -Wall src/TasProblems/prodconstas.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/mytasmutex.c
 
-prodconsttas: src/prodconsttas.c
-	gcc -o prodconsttas -Wall src/prodconsttas.c src/mysemttas.c src/queue.c src/myttasmutex.c
+prodconsttas: src/TtasProblems/prodconsttas.c
+	gcc -o prodconsttas -Wall src/TtasProblems/prodconsttas.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/myttasmutex.c
 
-rwtas: src/lectecrivtas.c
-	gcc -o rwtas -Wall src/lectecrivtas.c src/mysemttas.c src/queue.c src/mytasmutex.c
+rwtas: src/TasProblems/lectecrivtas.c
+	gcc -o rwtas -Wall src/TasProblems/lectecrivtas.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/mytasmutex.c
 
-rwttas: src/lectecrivttas.c
-	gcc -o rwttas -Wall src/lectecrivttas.c src/mysemttas.c src/queue.c src/myttasmutex.c
+rwttas: src/TtasProblems/lectecrivttas.c
+	gcc -o rwttas -Wall src/TtasProblems/lectecrivttas.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/myttasmutex.c
 
 backoff: src/backoff.c
-	gcc -o backoff -Wall src/backoff.c src/mybackoffmutex.c
+	gcc -o backoff -Wall src/backoff.c src/MyMutex/mybackoffmutex.c
 
 ttastest: src/ttastest.c
 	gcc -o ttastest -Wall src/ttastest.c

@@ -1,4 +1,4 @@
-#include "../headers/mytasmutex.h"
+#include "../../headers/myttasmutex.h"
 
 int testAndSet(int* verrou,int a){
     int ret;
@@ -13,8 +13,11 @@ int testAndSet(int* verrou,int a){
 }
 
 void lock(int *verrou){
-    while (testAndSet(verrou,1)){}
+    while (testAndSet(verrou,1)){
+        while(*verrou);
+    }
 }
+
 
 void unlock(int *verrou) {
     testAndSet(verrou,0);

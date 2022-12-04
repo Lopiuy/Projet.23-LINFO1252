@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include "../headers/queue.h"
+#include "../../headers/queue.h"
 
 int *dequeue(queue_t *q) {
     if (q->first == NULL) {

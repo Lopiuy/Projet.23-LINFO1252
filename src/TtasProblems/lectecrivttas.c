@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <errno.h>
-#include "../headers/myttasmutex.h"
+#include "../../headers/myttasmutex.h"
 
 
 #define Nw 640 // total number of writings // to change -> 640 (x128)
