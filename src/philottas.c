@@ -9,22 +9,22 @@ int nb_philosophs = 0;
 int nb_baguettes = 0;
 
 void eat(int id) {
-    fprintf(stderr,"Philosophe [%d] mange\n",id);
+    //fprintf(stderr,"Philosophe [%d] mange\n",id);
     return;
 }
 
 void think(int id){
-    fprintf(stderr,"Philosophe [%d] pense\n",id);
+    //fprintf(stderr,"Philosophe [%d] pense\n",id);
     return;
 }
 
 void* philosophe(void* args){
-    fprintf(stderr,"%s\n","DEBUT");
+    //fprintf(stderr,"%s\n","DEBUT");
     int *id = (int*)args;
     int left = *id;
     int right = (left + 1) % nb_baguettes;
     int i = 0;
-    while(i < 10){  //100000
+    while(i < 100000){  //100000
         think(*id);
         if(left<right){
             lock(&baguette_mutex[left]);
