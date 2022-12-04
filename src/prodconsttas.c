@@ -3,9 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <semaphore.h>
+#include "../headers/myttasmutex.h"
+
 
 int* buffer;
-pthread_mutex_t buff_mutex;
+int buff_mutex = 0;
 sem_t sem_full;
 sem_t sem_empty;
 int buf_in_index = 0;
@@ -22,22 +24,17 @@ void* producer_func(void* arg){
             perror("sem_wait failed with error");
             exit(-1);
         }
-        if (pthread_mutex_lock(&buff_mutex)){
-            perror("Buffer mutex failed with error");
-            exit(-1);
-        }
+
+        lock(&buff_mutex);
 
         buffer[buf_in_index] = 2;
         buf_in_index = (buf_in_index + 1) % 8;
 
-        if (pthread_mutex_unlock(&buff_mutex)){
-            perror("Buffer mutex failed with error");
-            exit(-1);
-        }
+        unlock(&buff_mutex);
         if (sem_post(&sem_full)){
             perror("sem_post failed with error");
             exit(-1);
-        }
+    }
     }
     free(iter);
     return (NULL);
@@ -51,18 +48,12 @@ void* consumer_func(void* arg){
             perror("sem_wait failed with error");
             exit(-1);
         }
-        if(pthread_mutex_lock(&buff_mutex)){
-            perror("Buffer mutex failed with error");
-            exit(-1);
-        }
+        lock(&buff_mutex);
 
         buffer[buf_out_index] = 0;
         buf_out_index = (buf_out_index + 1) % 8;
 
-        if(pthread_mutex_unlock(&buff_mutex)){
-            perror("Buffer mutex failed with error");
-            exit(-1);
-        }
+        unlock(&buff_mutex);
         if(sem_post(&sem_empty)){
             perror("sem_post failed with error");
             exit(-1);
@@ -90,12 +81,6 @@ int main(int argc, char * argv[]){
     buffer = (int*)malloc(8*sizeof(int));
     if(buffer == NULL){
         perror("Buffer allocation failed with error");
-        return -1;
-    }
-
-
-    if(pthread_mutex_init(&buff_mutex,NULL)){
-        perror("Mutex initailisation failed with error");
         return -1;
     }
 
@@ -172,10 +157,6 @@ int main(int argc, char * argv[]){
     }
     if(sem_destroy(&sem_full)){
         perror("Semaphore destroy failed with error");
-        return -1;
-    }
-    if(pthread_mutex_destroy(&buff_mutex)){
-        perror("Mutex destroy failed with error");
         return -1;
     }
     free(buffer);

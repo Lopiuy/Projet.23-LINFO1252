@@ -9,7 +9,7 @@ echo "min,max,nb threads" &> measures/measure_ttastest.csv
 for thread in "${THREADS[@]}"; do
     for i in {1..10}; do
         make ttastest -j "$thread" -s
-        ./ttastest "$thread" >>measures/measure_ttastest.csv 2>&1                    # s = silent (do not print commands in terminal), j = number of jobs(threads)
+        ./ttastest "$thread" >>measures/measure_ttastest.csv 2>&1
         make -s clean
     done
 done

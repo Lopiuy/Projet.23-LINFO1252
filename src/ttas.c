@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include "../headers/mytasmutex.h"
 
 #define N 6400
 
