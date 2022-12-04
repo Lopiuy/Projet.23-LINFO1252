@@ -1,25 +1,11 @@
 #ifndef MYTASMUTEX_H
 #define MYTASMUTEX_H
 
-int testAndSet(int* verrou,int a){
-    int ret;
-    asm (
-            "movl %2, %%eax;"
-            "xchg %%eax, %1;"
-            "movl %%eax, %0"
-            :"=r"(ret), "=m"(*verrou)
-            :"r"(a)
-            :"%eax");
-    return ret;
-}
+int testAndSet(int* verrou,int a);
 
-void lock(int *verrou){
-    while (testAndSet(verrou,1)){}
-}
+void lock(int *verrou);
 
-void unlock(int *verrou) {
-    testAndSet(verrou,0);
-}
+void unlock(int *verrou);
 
 
 #endif //MYTASMUTEX_H

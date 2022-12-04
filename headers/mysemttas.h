@@ -2,6 +2,7 @@
 #define SEM_H
 
 #include "../headers/queue.h"
+#include "../headers/myttasmutex.h"
 
 typedef struct cond cond_t;
 struct cond {
@@ -15,10 +16,6 @@ typedef struct {
     int wakeup; // number of threads that can be woken up
     cond_t *cond; //condition variable to suspend threads
 } mysem_t;
-
-void lock(int *verrou);
-
-void unlock(int *verrou);
 
 cond_t *cond_init(void);
 

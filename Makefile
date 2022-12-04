@@ -27,33 +27,33 @@ plot: plot.py
 	python3 plot.py measures/measure_tas.csv measures/measure_ttas.csv
 
 testandset: src/tas.c
-	gcc -o tas -Wall src/tas.c
+	gcc -o tas -Wall src/tas.c src/mytasmutex.c
 
 testandtestandset: src/ttas.c
-	gcc -o ttas -Wall src/ttas.c
+	gcc -o ttas -Wall src/ttas.c src/myttasmutex.c
 
 dummy: src/dummysem.c
-	gcc -o dummy src/dummysem.c src/mysem.c src/queue.c
+	gcc -o dummy src/dummysem.c src/mysemttas.c src/queue.c src/myttasmutex.c
 	./dummy
 	rm -f dummy
 
 philotas: src/philotas.c
-	gcc -o philotas -Wall src/philotas.c
+	gcc -o philotas -Wall src/philotas.c src/mytasmutex.c
 
 philottas: src/philottas.c
-	gcc -o philottas -Wall src/philottas.c
+	gcc -o philottas -Wall src/philottas.c src/myttasmutex.c
 
 prodconstas: src/prodconstas.c
-	gcc -o prodconstas -Wall src/prodconstas.c
+	gcc -o prodconstas -Wall src/prodconstas.c src/mysemttas.c src/queue.c src/mytasmutex.c
 
 prodconsttas: src/prodconsttas.c
-	gcc -o prodconsttas -Wall src/prodconsttas.c
+	gcc -o prodconsttas -Wall src/prodconsttas.c src/mysemttas.c src/queue.c src/myttasmutex.c
 
 rwtas: src/lectecrivtas.c
-	gcc -o rwtas -Wall src/lectecrivtas.c
+	gcc -o rwtas -Wall src/lectecrivtas.c src/mysemttas.c src/queue.c src/mytasmutex.c
 
 rwttas: src/lectecrivttas.c
-	gcc -o rwttas -Wall src/lectecrivttas.c
+	gcc -o rwttas -Wall src/lectecrivttas.c src/mysemttas.c src/queue.c src/myttasmutex.c
 
 backoff: src/backoff.c
 	gcc -o backoff -Wall src/backoff.c

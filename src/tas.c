@@ -9,26 +9,6 @@
 
 int verrou = 0;
 
-int testAndSet(int* verrou,int a){
-    int ret;
-    asm (
-        "movl %2, %%eax;"
-        "xchg %%eax, %1;"
-        "movl %%eax, %0"
-    :"=r"(ret), "=m"(*verrou)
-    :"r"(a)
-    :"%eax");
-    return ret;
-}
-
-void lock(int *verrou){
-    while (testAndSet(verrou,1)){}
-}
-
-void unlock(int *verrou) {
-    testAndSet(verrou,0);
-}
-
 void *func(void *param){
     int stop = *((int *) param);
     for (int i = 0; i < stop; i++) {

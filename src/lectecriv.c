@@ -18,84 +18,130 @@ sem_t rsem; //Pour bloquer des readers
 int readcount = 0;
 int writecount = 0;
 
-typedef struct { // to delete
-    int *stop;
-    int *id;
-} args_t;
-
 
 void* writer(void* arg)
 {
-    // int *stop = (int *) arg;
-    for (int i = 0; i < *((args_t *) arg)->stop; i++) // to change
+    int *stop = (int *) arg;
+    for (int i = 0; i < *stop; i++)
     {
-        pthread_mutex_lock(&mutex_writecount);
+        if(pthread_mutex_lock(&mutex_writecount)){
+            perror("writer mutex failed with error");
+            exit(-1);
+        }
         writecount++;
         if (writecount==1)
         {
-            sem_wait(&rsem);
+            if (sem_wait(&rsem)){
+                perror("sem_wait failed with error");
+                exit(-1);
+            }
         }
-        pthread_mutex_unlock(&mutex_writecount);
-        sem_wait(&wsem);
+        if(pthread_mutex_unlock(&mutex_writecount)){
+            perror("writer mutex failed with error");
+            exit(-1);
+        }
+        if(sem_wait(&wsem)){
+            perror("sem_wait failed with error");
+            exit(-1);
+        }
 
         // write database
         for (int i = 0; i < 10000; i++);
-        //printf("thread %d has written\n", *((args_t *) arg)->id);
 
-        sem_post(&wsem);
-        pthread_mutex_lock(&mutex_writecount);
+        if(sem_post(&wsem)){
+            perror("sem_post failed with error");
+            exit(-1);
+        }
+        if(pthread_mutex_lock(&mutex_writecount)){
+            perror("writer mutex failed with error");
+            exit(-1);
+        }
         writecount--;
         if(writecount==0)
         {
-            sem_post(&rsem);
+            if(sem_post(&rsem)){
+                perror("sem_post failed with error");
+                exit(-1);
+            }
         }
-        pthread_mutex_unlock(&mutex_writecount);
+        if(pthread_mutex_unlock(&mutex_writecount)){
+            perror("writer mutex failed with error");
+            exit(-1);
+        }
     }
+    free(stop);
     return NULL;
 }
 
 void* reader(void* arg)
 {
-    // int *stop = (int *) arg;
-    for (int i = 0; i < *((args_t *) arg)->stop; i++) // to change
+    int *stop = (int *) arg;
+    for (int i = 0; i < *stop; i++)
     {
-        pthread_mutex_lock(&z);
+        if(pthread_mutex_lock(&z)){
+            perror("z mutex failed with error");
+            exit(-1);
+        }
 
-        sem_wait(&rsem); //un seul reader à la fois
-        pthread_mutex_lock(&mutex_readcount);
+        if(sem_wait(&rsem)){  //un seul reader à la fois
+            perror("sem_wait failed with error");
+            exit(-1);
+        }
+        if(pthread_mutex_lock(&mutex_readcount)){
+            perror("reader mutex failed with error");
+            exit(-1);
+        }
         readcount++;
         if (readcount==1)
         {
-            sem_wait(&wsem);
+            if(sem_wait(&wsem)){
+                perror("sem_wait failed with error");
+                exit(-1);
+            }
         }
-        pthread_mutex_unlock(&mutex_readcount);
-        sem_post(&rsem); //libération du prochain reader
+        if(pthread_mutex_unlock(&mutex_readcount)){
+            perror("reader mutex failed with error");
+            exit(-1);
+        }
+        if(sem_post(&rsem)) { //libération du prochain reader
+            perror("sem_post failed with error");
+            exit(-1);
+        }
 
-        pthread_mutex_unlock(&z); //si on a un 2ème reader et un writer qui attende wsem (sem_wait(&rsem)),
-        // il faut donner la priorité au writer. En faisant ceci, on empêche qu'un 2ème
-        // reader attende (vu qu'il doit attendre que z est unlock, et le post rsem est fait
-        // avant l'unlock -> writer va être libéré avant)
+        if(pthread_mutex_unlock(&z)) {              //si on a un 2ème reader et un writer qui attende wsem (sem_wait(&rsem)),
+            perror("z mutex failed with error");    // il faut donner la priorité au writer. En faisant ceci, on empêche qu'un 2ème
+            exit(-1);                               // reader attende (vu qu'il doit attendre que z est unlock, et le post rsem est fait
+        }                                           // avant l'unlock -> writer va être libéré avant)
 
         // read database
         for (int i = 0; i < 10000; i++);
-        //printf("thread %d has read\n", *((args_t *) arg)->id);
 
-        pthread_mutex_lock(&mutex_readcount);
+        if(pthread_mutex_lock(&mutex_readcount)){
+            perror("reader mutex failed with error");
+            exit(-1);
+        }
         readcount--;
         if(readcount==0)
         {
-            sem_post(&wsem);
+            if(sem_post(&wsem)){
+                perror("sem_post failed with error");
+                exit(-1);
+            }
         }
-        pthread_mutex_unlock(&mutex_readcount);
+        if(pthread_mutex_unlock(&mutex_readcount)){
+            perror("reader mutex failed with error");
+            exit(-1);
+        }
     }
+    free(stop);
     return NULL;
 }
 
 int main(int argc, char *argv[]){
 
-    if (argc != 3){
-        fprintf(stderr, "Error: %s\n", "Invalid arguments was given");
-        exit(EXIT_FAILURE);
+    if (argc < 3){
+        perror("Invalid arguments was given");
+        return -1;
     }
 
     int nwriters = atoi(argv[1]);
@@ -105,13 +151,13 @@ int main(int argc, char *argv[]){
     pthread_t readers[nreaders];
 
     if (pthread_mutex_init(&mutex_readcount, NULL) || pthread_mutex_init(&mutex_writecount, NULL) || pthread_mutex_init(&z, NULL)){
-        fprintf(stderr, "Error: %s\n", strerror(errno));
-        exit(EXIT_FAILURE);
+        perror("Mutex initialization failed");
+        return -1;
     }
 
     if (sem_init(&wsem,0,1) == -1 || sem_init(&rsem,0,1) == -1) {
-        fprintf(stderr, "Error: %s\n", strerror(errno));
-        exit(EXIT_FAILURE);
+        perror("Semaphore initialization failed");
+        return -1;
     }
 
     for (int i = 0; i < nwriters; i++) {
@@ -121,16 +167,9 @@ int main(int argc, char *argv[]){
         int *param = (int *) malloc(sizeof(int));
         memcpy(param, &p, sizeof(int));
 
-        int *id = (int *) malloc(sizeof(int)); // to delete
-        memcpy(id, &i, sizeof(int));
-
-        args_t *arg = (args_t *) malloc(sizeof(args_t)); // to delete
-        arg->stop = param;
-        arg->id = id;
-
-        if (pthread_create(&writers[i], NULL, &writer, (void *) arg) != 0){ // to change
-            fprintf(stderr, "Error: %s\n", strerror(errno));
-            exit(EXIT_FAILURE);
+        if (pthread_create(&writers[i], NULL, &writer, (void *) param) != 0){
+            perror("Writer thread creation failed");
+            return -1;
         }
     }
 
@@ -141,38 +180,30 @@ int main(int argc, char *argv[]){
         int* param = (int *) malloc(sizeof(int));
         memcpy(param, &p, sizeof(int));
 
-        int *id = (int *) malloc(sizeof(int)); // to delete
-        int j = i + nwriters;
-        memcpy(id, &j, sizeof(int));
-
-        args_t *arg = (args_t *) malloc(sizeof(args_t)); // to delete
-        arg->stop = param;
-        arg->id = id;
-
-        if (pthread_create(&readers[i], NULL, &reader, (void *) arg) != 0){ // to change
-            fprintf(stderr, "Error: %s\n", strerror(errno));
-            exit(EXIT_FAILURE);
+        if (pthread_create(&readers[i], NULL, &reader, (void *) param) != 0){
+            perror("Reader thread creation failed");
+            return -1;
         }
     }
     
     for (int i = 0; i < nwriters; i++) {
         if (pthread_join(writers[i], NULL) != 0){
-            fprintf(stderr, "Error: %s\n", strerror(errno));
-            exit(EXIT_FAILURE);
+            perror("Writer thread join failed");
+            return -1;
         }
     }
 
     for (int i = 0; i < nreaders; i++) {
         if (pthread_join(readers[i], NULL) != 0) {
-            fprintf(stderr, "Error: %s\n", strerror(errno));
-            exit(EXIT_FAILURE);
+            perror("Reader thread join failed");
+            return -1;
         }
     }
 
     if (pthread_mutex_destroy(&mutex_readcount) || pthread_mutex_destroy(&mutex_writecount) || pthread_mutex_destroy(&z) || sem_destroy(&rsem) || sem_destroy(&wsem)){
-        fprintf(stderr, "Error: %s\n", strerror(errno));
-        exit(EXIT_FAILURE);
+        perror("Destroy failed");
+        return -1;
     }
 
-    return EXIT_SUCCESS;
+    return 0;
 }

@@ -9,9 +9,9 @@ int *dequeue(queue_t *q) {
         return NULL;
     }
     int *id = q->first->id;
-    node_t *tmp = q->first;
+    //node_t *tmp = q->first;
     q->first = q->first->next;
-    free(tmp);
+    //free(tmp);
     return id;
 }
 

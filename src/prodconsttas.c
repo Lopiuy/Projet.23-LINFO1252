@@ -2,14 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <semaphore.h>
 #include "../headers/myttasmutex.h"
-
+#include "../headers/mysemttas.h"
 
 int* buffer;
 int buff_mutex = 0;
-sem_t sem_full;
-sem_t sem_empty;
+mysem_t* sem_full;
+mysem_t* sem_empty;
 int buf_in_index = 0;
 int buf_out_index = 0;
 
@@ -20,21 +19,14 @@ void* producer_func(void* arg){
         for (int j = 0; j < 10000; j++) {               //simulate production
         }
 
-        if (sem_wait(&sem_empty)){
-            perror("sem_wait failed with error");
-            exit(-1);
-        }
-
+        mysem_wait(sem_empty);
         lock(&buff_mutex);
 
         buffer[buf_in_index] = 2;
         buf_in_index = (buf_in_index + 1) % 8;
 
         unlock(&buff_mutex);
-        if (sem_post(&sem_full)){
-            perror("sem_post failed with error");
-            exit(-1);
-    }
+        mysem_post(sem_full);
     }
     free(iter);
     return (NULL);
@@ -44,20 +36,14 @@ void* producer_func(void* arg){
 void* consumer_func(void* arg){
     int* iter = (int*)arg;
     for(int i = 0; i < *iter; i++){
-        if(sem_wait(&sem_full)){
-            perror("sem_wait failed with error");
-            exit(-1);
-        }
+        mysem_wait(sem_full);
         lock(&buff_mutex);
 
         buffer[buf_out_index] = 0;
         buf_out_index = (buf_out_index + 1) % 8;
 
         unlock(&buff_mutex);
-        if(sem_post(&sem_empty)){
-            perror("sem_post failed with error");
-            exit(-1);
-        }
+        mysem_post(sem_empty);
 
         for(int j = 0; j < 10000; j++){                     //simulate consumption
         }
@@ -85,12 +71,14 @@ int main(int argc, char * argv[]){
     }
 
 
-    if(sem_init(&sem_empty,0,8) != 0){
-        perror("Creation of semaphore failed.");
+    sem_empty = mysem_init(8);
+    if(sem_empty == NULL){
+        perror("sem init of sem_empty failed with error");
         return -1;
     }
-    if(sem_init(&sem_full,0,0) != 0){
-        perror("Creation of semaphore failed.");
+    sem_full = mysem_init(0);
+    if(sem_full == NULL){
+        perror("sem init of sem_full failed with error");
         return -1;
     }
 
@@ -151,12 +139,14 @@ int main(int argc, char * argv[]){
     }
 
 
-    if(sem_destroy(&sem_empty)){
-        perror("Semaphore destroy failed with error");
+    int err = mysem_destroy(sem_empty);
+    if(err != 0){
+        perror("Semaphore sem_empty destroy failed with error");
         return -1;
     }
-    if(sem_destroy(&sem_full)){
-        perror("Semaphore destroy failed with error");
+    err = mysem_destroy(sem_full);
+    if(err != 0){
+        perror("Semaphore sem_full destroy failed with error");
         return -1;
     }
     free(buffer);

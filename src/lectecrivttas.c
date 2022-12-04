@@ -28,8 +28,8 @@ typedef struct { // to delete
 
 void* writer(void* arg)
 {
-    // int *stop = (int *) arg;
-    for (int i = 0; i < *((args_t *) arg)->stop; i++) // to change
+    int *stop = (int *) arg;
+    for (int i = 0; i < *stop; i++)
     {
         lock(&mutex_writecount);
         writecount++;
@@ -42,7 +42,6 @@ void* writer(void* arg)
 
         // write database
         for (int i = 0; i < 10000; i++);
-        //printf("thread %d has written\n", *((args_t *) arg)->id);
 
         sem_post(&wsem);
         lock(&mutex_writecount);
@@ -53,13 +52,14 @@ void* writer(void* arg)
         }
         unlock(&mutex_writecount);
     }
+    free(stop);
     return NULL;
 }
 
 void* reader(void* arg)
 {
-    // int *stop = (int *) arg;
-    for (int i = 0; i < *((args_t *) arg)->stop; i++) // to change
+    int *stop = (int *) arg;
+    for (int i = 0; i < *stop; i++)
     {
         lock(&z);
 
@@ -80,7 +80,6 @@ void* reader(void* arg)
 
         // read database
         for (int i = 0; i < 10000; i++);
-        //printf("thread %d has read\n", *((args_t *) arg)->id);
 
         lock(&mutex_readcount);
         readcount--;
@@ -90,6 +89,7 @@ void* reader(void* arg)
         }
         unlock(&mutex_readcount);
     }
+    free(stop);
     return NULL;
 }
 
@@ -118,14 +118,7 @@ int main(int argc, char *argv[]){
         int *param = (int *) malloc(sizeof(int));
         memcpy(param, &p, sizeof(int));
 
-        int *id = (int *) malloc(sizeof(int)); // to delete
-        memcpy(id, &i, sizeof(int));
-
-        args_t *arg = (args_t *) malloc(sizeof(args_t)); // to delete
-        arg->stop = param;
-        arg->id = id;
-
-        if (pthread_create(&writers[i], NULL, &writer, (void *) arg) != 0){ // to change
+        if (pthread_create(&writers[i], NULL, &writer, (void *) param) != 0){ // to change
             fprintf(stderr, "Error: %s\n", strerror(errno));
             exit(EXIT_FAILURE);
         }
@@ -138,15 +131,7 @@ int main(int argc, char *argv[]){
         int* param = (int *) malloc(sizeof(int));
         memcpy(param, &p, sizeof(int));
 
-        int *id = (int *) malloc(sizeof(int)); // to delete
-        int j = i + nwriters;
-        memcpy(id, &j, sizeof(int));
-
-        args_t *arg = (args_t *) malloc(sizeof(args_t)); // to delete
-        arg->stop = param;
-        arg->id = id;
-
-        if (pthread_create(&readers[i], NULL, &reader, (void *) arg) != 0){ // to change
+        if (pthread_create(&readers[i], NULL, &reader, (void *) param) != 0){
             fprintf(stderr, "Error: %s\n", strerror(errno));
             exit(EXIT_FAILURE);
         }
