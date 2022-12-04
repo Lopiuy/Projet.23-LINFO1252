@@ -13,7 +13,7 @@ prodcons: src/BaseProblems/prodcons.c
 rw: src/BaseProblems/lectecriv.c
 	$(run)
 
-plot: plot.py measures/measure_philo.csv measures/measure_prodcons.csv measures/measure_rw.csv measures/measure_tas.csv measures/measure_ttas.csv
+plot: plot.py measures
 	python3 plot.py measures/measure_philo.csv 
 	python3 plot.py measures/measure_prodcons.csv
 	python3 plot.py measures/measure_rw.csv
@@ -49,7 +49,7 @@ rwttas: src/TtasProblems/lectecrivttas.c src/MySemaphores/mysemttas.c src/MySema
 	$(run)
 
 backoff: src/backoff.c src/MyMutex/mybackoffmutex.c
-	$(run)
+	$(run) -lm
 
 ttastest: src/ttastest.c
 	$(run)
