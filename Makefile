@@ -1,68 +1,61 @@
+run = gcc -o $@ -Wall $^
 
+all: ./experiments.sh
+	./experiments.sh
+	make plot
 
-#all:
-#	make philo
-#	make prodcons
-#	make rw
-#	make testandset
-#	make testandtestandset
-#	make backoff
-#	make ttastest
-#	make scripts
-#	make plot
+philo: src/BaseProblems/philosophe.c
+	$(run)
 
-philo: src/philosophe.c
-	gcc -o philo -Wall src/philosophe.c
+prodcons: src/BaseProblems/prodcons.c
+	$(run)
 
-prodcons: src/prodcons.c
-	gcc -o prodcons -Wall src/prodcons.c
+rw: src/BaseProblems/lectecriv.c
+	$(run)
 
-rw: src/lectecriv.c
-	gcc -o rw -Wall src/lectecriv.c
-
-plot: plot.py
+plot: plot.py measures/measure_philo.csv measures/measure_prodcons.csv measures/measure_rw.csv measures/measure_tas.csv measures/measure_ttas.csv
 	python3 plot.py measures/measure_philo.csv 
 	python3 plot.py measures/measure_prodcons.csv
 	python3 plot.py measures/measure_rw.csv
 	python3 plot.py measures/measure_tas.csv measures/measure_ttas.csv
 
-testandset: src/tas.c
-	gcc -o tas -Wall src/tas.c
+tas: src/tas.c src/MyMutex/mytasmutex.c
+	$(run)
 
-testandtestandset: src/ttas.c
-	gcc -o ttas -Wall src/ttas.c
+ttas: src/ttas.c src/MyMutex/myttasmutex.c
+	$(run)
 
-dummy: src/dummysem.c
-	gcc -o dummy src/dummysem.c src/mysem.c src/queue.c
+dummy: src/dummysem.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/myttasmutex.c
+	$(run)
 	./dummy
-	rm -f dummy
+	rm -f $@
 
-philotas: src/philotas.c
-	gcc -o philotas -Wall src/philotas.c
+philotas: src/TasProblems/philotas.c src/MyMutex/mytasmutex.c
+	$(run)
 
-philottas: src/philottas.c
-	gcc -o philottas -Wall src/philottas.c
+philottas: src/TtasProblems/philottas.c src/MyMutex/myttasmutex.c
+	$(run)
 
-prodconstas: src/prodconstas.c
-	gcc -o prodconstas -Wall src/prodconstas.c
+prodconstas: src/TasProblems/prodconstas.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/mytasmutex.c
+	$(run)
 
-prodconsttas: src/prodconsttas.c
-	gcc -o prodconsttas -Wall src/prodconsttas.c
+prodconsttas: src/TtasProblems/prodconsttas.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/myttasmutex.c
+	$(run)
 
-rwtas: src/lectecrivtas.c
-	gcc -o rwtas -Wall src/lectecrivtas.c
+rwtas: src/TasProblems/lectecrivtas.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/mytasmutex.c
+	$(run)
 
-rwttas: src/lectecrivttas.c
-	gcc -o rwttas -Wall src/lectecrivttas.c
+rwttas: src/TtasProblems/lectecrivttas.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/myttasmutex.c
+	$(run)
 
-backoff: src/backoff.c
-	gcc -o backoff -Wall src/backoff.c
+backoff: src/backoff.c src/MyMutex/mybackoffmutex.c
+	$(run)
 
 ttastest: src/ttastest.c
-	gcc -o ttastest -Wall src/ttastest.c
+	$(run)
 
 zip:
-	tar -zcvf prog.tar.gz philosphe.c rw.c prodcons.c Makefile README.md
+	tar -zcvf Projet23-LINFO1252.tar.gz src scripts measures headers plot.py experiments.sh Makefile README.md
 
 scripts: experiments.sh
 	./experiments.sh
@@ -77,6 +70,10 @@ clean:
 	rm -f dummy
 	rm -f philotas
 	rm -f philottas
+	rm -f prodconstas
+	rm -f prodconsttas
+	rm -f rwtas
+	rm -f rwttas
 	rm -f backoff
 	rm -f ttastest
 

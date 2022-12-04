@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "../headers/mytasmutex.h"
 
 #define N 6400
 int min = 1000000;
@@ -11,7 +10,7 @@ int max = 0;
 
 int verrou = 0;
 
-int testAndSet(int* verrou,int a){
+int testAndSettest(int* verrou,int a){
     int ret;
     asm (
         "movl %2, %%eax;"
@@ -23,9 +22,9 @@ int testAndSet(int* verrou,int a){
     return ret;
 }
 
-void lock(int *verrou){
+void locktest(int *verrou){
     int i = 0;
-    while (testAndSet(verrou,1)){
+    while (testAndSettest(verrou,1)){
         while(*verrou){
         }
         i++;
@@ -35,17 +34,17 @@ void lock(int *verrou){
 }
 
 
-void unlock(int *verrou) {
-    testAndSet(verrou,0);
+void unlocktest(int *verrou) {
+    testAndSettest(verrou,0);
 }
 
 void *func(void *param){
     int stop = *((int *) param);
     for (int i = 0; i < stop; i++) {
-        lock(&verrou);
+        locktest(&verrou);
         // critical section
         for (int i = 0; i < 10000; i++);
-        unlock(&verrou);
+        unlocktest(&verrou);
     }
     return NULL;
 }

@@ -3,7 +3,7 @@
 
 int testAndSet(int* verrou,int a);
 
-void lock(int *verrou);
+void lock(int *verrou, int init, int max);
 
 void unlock(int *verrou);
 

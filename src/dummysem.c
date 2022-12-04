@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
-#include <semaphore.h>
-#include "../headers/mysem.h"
+#include "../headers/mysemttas.h"
 
 #define NTHREADS 2
 mysem_t *sem;

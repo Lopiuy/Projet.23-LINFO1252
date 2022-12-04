@@ -3,45 +3,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "../headers/mytasmutex.h"
+#include <math.h>
+#include "../headers/mybackoffmutex.h"
 
 #define N 6400
-#define MAX 1000
 
+int max;
 int verrou = 0;
 
-int testAndSet(int* verrou,int a){
-    int ret;
-    asm (
-            "movl %2, %%eax;"
-            "xchg %%eax, %1;"
-            "movl %%eax, %0"
-            :"=r"(ret), "=m"(*verrou)
-            :"r"(a)
-            :"%eax");
-    return ret;
-}
-
-void lock(int *verrou,int init){
-    int wait = init;
-    while (testAndSet(verrou,1)){
-        while(*verrou);
-        for (int i = 0; i < wait; i++) {}
-        if(wait<MAX){
-            wait = 2*wait;
-        }
-    }
-}
-
-
-void unlock(int *verrou) {
-    testAndSet(verrou,0);
-}
 
 void *func(void *param){
     int stop = *((int *) param);
     for (int i = 0; i < stop; i++) {
-        lock(&verrou,i%10);
+        lock(&verrou,i%10,max);
         // critical section
         for (int j = 0; j < 10000; j++);
         unlock(&verrou);
@@ -51,13 +25,15 @@ void *func(void *param){
 
 int main(int argc, char *argv[]){
 
-    if (argc != 2) {
-        fprintf(stderr, "Error: %s\n", "Invalid arguments was given");
-        exit(EXIT_FAILURE);
+    if (argc < 2) {
+        perror("Invalid arguments was given");
+        return -1;
     }
 
     int nthreads = atoi(argv[1]);
     pthread_t threads[nthreads];
+
+    max = 2500*pow(nthreads,-0.55);
 
     for (int i = 0; i < nthreads ; i++) {
 
