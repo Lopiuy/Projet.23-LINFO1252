@@ -16,7 +16,7 @@ void lock(int *verrou,int init, int max){
     int wait = init;
     while (testAndSet(verrou,1)){
         while(*verrou);
-        for (int i = 0; i < wait; i++) {}
+        for (int i = 0; i < wait; i++);
         if(wait<max){
             wait = 2*wait;
         }

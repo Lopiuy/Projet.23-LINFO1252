@@ -2,7 +2,9 @@
 
 # shellcheck disable=SC2016
 
-THREADS=(1 2 4 8 16 32 64)
+NTHREADS=$(nproc)
+MAX=$((NTHREADS*2))
+THREADS=($(for ((i=1;i<=$MAX;i*=2)); do echo "${i}"; done))
 
 echo "nb philosophs,nb threads,Mesure i,time" &> measures/measure_philotas.csv
 
@@ -19,9 +21,8 @@ echo "nb_cons,nb_prod,nb threads,Mesure i,time" &> measures/measure_prodconstas.
 
 for thread in "${THREADS[@]}"; do
     if [ "$thread" != 1 ]; then
-      two=2
-      c=$((thread / two))
-      p=$((thread / two))
+      c=$((thread/2))
+      p=$((thread/2))
       for i in {1..5}; do
             make prodconstas -j "$thread" -s
             /usr/bin/time -f "$c,$p,$thread,$i,%e" ./prodconstas "$c" "$p" >>measures/measure_prodconstas.csv 2>&1                    # s = silent (do not print commands in terminal), j = number of jobs(threads)
@@ -34,9 +35,8 @@ echo "nb_reader,nb_writer,nb threads,Mesure i,time" &> measures/measure_rwtas.cs
 
 for thread in "${THREADS[@]}"; do
     if [ "$thread" != 1 ]; then
-      two=2
-      r=$((thread / two))
-      w=$((thread / two))
+      r=$((thread/2))
+      w=$((thread/2))
       for i in {1..5}; do
             make rwtas -j "$thread" -s
             /usr/bin/time -f "$r,$w,$thread,$i,%e" ./rwtas "$r" "$w" >>measures/measure_rwtas.csv 2>&1
