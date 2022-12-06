@@ -6,6 +6,7 @@ NTHREADS=$(nproc)
 MAX=$((NTHREADS*2))
 THREADS=($(for ((i=1;i<=$MAX;i*=2)); do echo "${i}"; done))
 
+./scripts/performanceBackoffValues.sh
 IT=$(python3 src/BackOff/backoffValue.py)
 
 echo "nb threads,measure i,time" &> measures/measure_backoff.csv
