@@ -4,7 +4,7 @@
 
 NTHREADS=$(nproc)
 MAX=$((NTHREADS*2))
-THREADS=($(for ((i=2;i<=$MAX;i*=2)); do echo "${i}"; done))
+THREADS=($(for ((i=1;i<=$MAX;i*=2)); do echo "${i}"; done))
 
 echo "min,max,nb threads" &> measures/measure_ttastest.csv
 

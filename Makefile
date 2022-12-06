@@ -49,11 +49,6 @@ tas: src/tas.c src/MyMutex/mytasmutex.c
 ttas: src/ttas.c src/MyMutex/myttasmutex.c
 	$(run)
 
-dummy: src/dummysem.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/myttasmutex.c
-	$(run)
-	./dummy
-	rm -f $@
-
 philotas: src/TasProblems/philotas.c src/MyMutex/mytasmutex.c
 	$(run)
 
@@ -72,8 +67,8 @@ rwtas: src/TasProblems/lectecrivtas.c src/MySemaphores/mysemttas.c src/MySemapho
 rwttas: src/TtasProblems/lectecrivttas.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/myttasmutex.c
 	$(run)
 
-backoff: src/backoff.c src/MyMutex/mybackoffmutex.c
-	$(run) -lm
+backoff: src/BackOff/backoff.c src/MyMutex/mybackoffmutex.c
+	$(run)
 
 ttastest: src/ttastest.c
 	$(run)
