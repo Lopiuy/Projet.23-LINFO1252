@@ -93,17 +93,23 @@ De plus, la commandes `make zip` permet de générer une archive du projet. La c
 Enfin, un fichier écrit en language *python* est également fourni et permet de représenter graphiquement les données des fichiers *.csv*. Son utilisation est décrite ci-dessous :
 ```bash
 $ python3 plot.py --help
-usage: plot.py [-h] [-d DUAL_PLOT] [-m MERGED_PLOT] file_csv
+usage: plot.py [-h] [-d file_csv2] [-m file_csv2] [-m3 file_csv2 file_csv3]
+               [-m3s file_csv2 file_csv3]
+               file_csv
 
 positional arguments:
   file_csv              a csv file to plot
 
 options:
   -h, --help            show this help message and exit
-  -d DUAL_PLOT, --dual_plot DUAL_PLOT
+  -d file_csv2, --dual_plot file_csv2
                         a second csv file to plot as dual plot
-  -m MERGED_PLOT, --merged_plot MERGED_PLOT
+  -m file_csv2, --merged_plot file_csv2
                         a second csv file to plot as merged plot
+  -m3 file_csv2 file_csv3, --merged_plot3 file_csv2 file_csv3
+                        two other csv files to plot as merged plot
+  -m3s file_csv2 file_csv3, --merged_plot3split file_csv2 file_csv3
+                        two other csv files to plot as merged plot with a splitted component
 ```
 La commande `make plot` automatise la compilation de `plot.py` en affichant les résultats principaux des expériences performées.
 
