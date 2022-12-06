@@ -15,7 +15,9 @@
 
 ## Sujets étudiés
 
-* Problème des philosophes, des lecteurs & écrivains et des producteurs & consommateurs
+* Problème des [philosophes](https://en.wikipedia.org/wiki/Dining_philosophers_problem), 
+des [lecteurs & écrivains](https://en.wikipedia.org/wiki/Readers–writers_problem) et 
+des [producteurs & consommateurs](https://en.wikipedia.org/wiki/Producer–consumer_problem)
   - Implémentations via la librairie POSIX et les verrous d'attente active
 * Algorithme test-and-set ([TAS](https://en.wikipedia.org/wiki/Test-and-set))  
 * Algorithme test-and-test-and-set ([TTAS](https://en.wikipedia.org/wiki/Test_and_test-and-set))
@@ -54,8 +56,8 @@ $ ./ttas 4
 
 # Dummy multithreading program using spinlocks build on backoff-TTAS algorithm
 $ make backoff
-# ./backoff <number of threads used>
-$ ./backoff 4
+# ./backoff <number of threads used> <minimum waiting time> <maximum waiting time>
+$ ./backoff 4 2 100
 
 # Philosopher's problem implementation using TAS algorithm
 $ make philotas

@@ -49,11 +49,6 @@ tas: src/tas.c src/MyMutex/mytasmutex.c
 ttas: src/ttas.c src/MyMutex/myttasmutex.c
 	$(run)
 
-dummy: src/dummysem.c src/MySemaphores/mysemttas.c src/MySemaphores/queue.c src/MyMutex/myttasmutex.c
-	$(run)
-	./dummy
-	rm -f $@
-
 philotas: src/TasProblems/philotas.c src/MyMutex/mytasmutex.c
 	$(run)
 
