@@ -1,7 +1,5 @@
 run = gcc -o $@ -Wall $^  -lpthread
 
-forSubmition:
-
 
 all:
 	make philo
