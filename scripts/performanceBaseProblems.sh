@@ -37,7 +37,7 @@ for thread in "${THREADS[@]}"; do
     if [ "$thread" != 1 ]; then
       r=$((thread/2))
       w=$((thread/2))
-      for i in {1..5}; do
+      for i in {1..100}; do
             make rw -j "$thread" -s
             /usr/bin/time -f "$r,$w,$thread,$i,%e" ./rw "$r" "$w" >>measures/measure_rw.csv 2>&1
             make -s clean
