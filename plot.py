@@ -66,7 +66,10 @@ def customization(ax, labels, y, vp, problem):
     #box = ax.get_position()
     #ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
     #ax.legend(loc='center left', bbox_to_anchor=(1.02, 0.5), fancybox=True)
-    ax.legend(loc='upper left', fontsize=12)
+    if problem == 'pc' or problem == 'rw':
+        ax.legend(loc='upper right', fontsize=12)
+    else:
+        ax.legend(loc='upper left', fontsize=12)
 
 
 def customization_dual(ax, labels, vp, color1, color2, problem):
@@ -329,7 +332,7 @@ def plot_merged3(y1, y2, y3, threads, problem=''):
 
 def plot_merged3s(y1, y2, y3, threads, problem=''):
     fig, ax = plt.subplots(nrows=1, ncols=2, gridspec_kw={'width_ratios':[5,1]}, figsize=(9.6, 4), dpi=125, num="trimerged_plot_"+problem)
-    fig.tight_layout(pad=3.0)
+    fig.tight_layout(pad=2.0)
 
     nthreads = len(threads)
     labels = [str(threads[i]) for i in range(nthreads)]
