@@ -6,15 +6,15 @@
 
 typedef struct cond cond_t;
 struct cond {
-    queue_t *q; // queue of sleeping threads
-    int mx; // mutex to protect the queue
+    queue_t *q; // file de threads endormis
+    int mx; // mutex pour protéger la file
 };
 
 typedef struct {
     int verrou; // = mutex
-    int value; // value of the semaphore
-    int wakeup; // number of threads that can be woken up
-    cond_t *cond; //condition variable to suspend threads
+    int value; // valeur de la semaphore
+    int wakeup; // nombre de threads qui peuvent être réveillés
+    cond_t *cond; // variable conditionnelle pour suspendre les threads
 } mysem_t;
 
 cond_t *cond_init(void);

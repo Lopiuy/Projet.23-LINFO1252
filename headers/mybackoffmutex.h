@@ -7,5 +7,4 @@ void lock(int *verrou, int init, int max);
 
 void unlock(int *verrou);
 
-
 #endif //MYTTASMUTEX_H

@@ -5,15 +5,15 @@
 #include <errno.h>
 #include "../headers/myttasmutex.h"
 
-#define N 6400
+#define N 6400 // nombre total de sections critiques à effectuer
 
-int verrou = 0;
+int verrou = 0; // verrou par attente active
 
 void *func(void *param){
-    int stop = *((int *) param);
+    int stop = *((int *) param); // nombre de sections critiques par thread
     for (int i = 0; i < stop; i++) {
         lock(&verrou);
-        // critical section
+        // section critique
         for (int j = 0; j < 10000; j++);
         unlock(&verrou);
     }
@@ -27,9 +27,10 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
 
-    int nthreads = atoi(argv[1]);
+    int nthreads = atoi(argv[1]); // nombre de threads d'exécution
     pthread_t threads[nthreads];
 
+    // lancement des threads
     for (int i = 0; i < nthreads ; i++) {
 
         int p = N/nthreads;
@@ -43,6 +44,7 @@ int main(int argc, char *argv[]){
         }
     }
 
+    // terminaison des threads
     for (int i = 0; i < nthreads ; i++) {
         if (0 != pthread_join(threads[i], NULL)) {
             fprintf(stderr, "Error: %s\n", strerror(errno));
