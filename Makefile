@@ -65,10 +65,7 @@ ttastest: src/ttastest.c
 	$(run)
 
 zip:
-	zip -r Projet23-LINFO1252.zip src scripts measures headers plot.py experiments.sh Makefile README.md
-
-scripts: experiments.sh
-	./experiments.sh
+	zip -r Projet23-LINFO1252.zip src scripts measures headers plot.py experiments.sh Makefile README.md RAPPORT_LINFO1252
 
 clean:
 	rm -f *.o

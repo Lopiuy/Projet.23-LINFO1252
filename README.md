@@ -26,7 +26,7 @@ des [producteurs & consommateurs](https://en.wikipedia.org/wiki/Producer–consu
 
 ## Usage
 
-Le répertoire propose les fonctionnalités ci-dessous. De plus, la commande `make` permet de lancer les toutes les expériences et de produire les graphiques correspondants.
+Le répertoire propose les fonctionnalités ci-dessous.
 
 ```bash
 # Philosopher's problem implementation using POSIX library
@@ -89,7 +89,7 @@ $ make rwttas
 # ./rwttas <number of reader threads> <number of writer threads>
 $ ./rwttas 2 2
 ```
-De plus, la commandes `make zip` permet de générer une archive du projet. La commande `make scripts` performe une série d'expériences sur les problèmes de synchronisations recensés ci-dessus et recueille les résultats sous la forme de fichiers *.csv* répertoriés dans le sous-dossier *measures*.
+De plus, la commandes `make zip` permet de générer une archive du projet. La commande `./experiments.sh` performe une série d'expériences sur les problèmes de synchronisations recensés ci-dessus et recueille les résultats sous la forme de fichiers *.csv* répertoriés dans le sous-dossier *measures*.
 Enfin, un fichier écrit en language *python* est également fourni et permet de représenter graphiquement les données des fichiers *.csv*. Son utilisation est décrite ci-dessous :
 ```bash
 $ python3 plot.py --help
@@ -114,7 +114,7 @@ options:
 La commande `make plot` automatise la compilation de `plot.py` en affichant les résultats principaux des expériences performées.
 
 > **Note**
-> L'exécution de `make scripts` peut prendre un certain temps.
+> L'exécution de `./experiments.sh` peut prendre un certain temps.
 
 ## Auteurs
 
