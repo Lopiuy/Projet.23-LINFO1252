@@ -4,6 +4,7 @@
 #include <errno.h>
 #include "../../headers/mysemtas.h"
 
+// initialisation de la variable conditionnelle
 cond_t *cond_init(void) {
 
     cond_t *cond = (cond_t *) malloc(sizeof(cond_t));
@@ -13,46 +14,49 @@ cond_t *cond_init(void) {
     }
 
     int v = 0;
-    cond->mx = v;
+    cond->mx = v; // verrou qui protège la file de threads
 
     queue_t *q = (queue_t *) malloc(sizeof(queue_t));
     if (q == NULL) {
         errno = ENOMEM;
         return NULL;
     }
-    q->first = NULL;
-    q->last = NULL;
-    cond->q = q;
+    q->first = NULL; // premier thread dans la file
+    q->last = NULL; // second thread dans la file
+    cond->q = q; // la file de verrous (= id. des threads) est stockée dans la variable conditionnelle
 
     return cond;
 }
 
+// bloque les threads sur la variable conditionnelle
 void cond_wait(cond_t *cv, int *verrou) {
 
-    lock(&(cv->mx)); // make the queue thread safe
-    int id = 0;
-    enqueue(cv->q, &id);
-    lock(&id);
-    unlock(&(cv->mx));
+    lock(&(cv->mx)); // verrouillage de la file
+    int id = 0; // verrou exclusif à chaque thread endormi
+    enqueue(cv->q, &id); // on ajoute le verrou dans la file
+    lock(&id); // on endort le thread en le bloquant sur le verrou mis dans la file
+    unlock(&(cv->mx)); // déverrouillage de la file
 
-    unlock(verrou);
-    lock(&id); // dummy lock to simulate sleeping
-    unlock(&id);
-    lock(verrou);
+    unlock(verrou); // déverrouillage du verrou pour que les autres threads continuent leur exécution
+    lock(&id); // verrouillage factice
+    unlock(&id); // si le thread reprend le verrou c'est que ce dernier a été enlevé de la file quelque part :)
+    lock(verrou); // reprise du verrou pour exécuter la suite de sem_wait
 }
 
+// envoie un signal aux threads bloqués sur la variable conditionnelle
 void cond_signal(cond_t *cv) {
 
-    lock(&(cv->mx));
-    int *id = dequeue(cv->q);
-    unlock(&(cv->mx));
+    lock(&(cv->mx)); // verrouillage de la file
+    int *id = dequeue(cv->q); // on récupère le verrou d'un thread bloqué
+    unlock(&(cv->mx)); // déverrouillage de la file
 
     if (id != NULL) {
-        unlock(id);
+        unlock(id); // débloquons ce threads
     }
-    // if the queue is empty, do nothing
+    // si la queue est vide, on ne fait rien
 }
 
+// initialisation de la sémaphore
 mysem_t *mysem_init(int value) {
 
     mysem_t *semaphore = (mysem_t *) malloc(sizeof(mysem_t));
@@ -60,13 +64,13 @@ mysem_t *mysem_init(int value) {
         errno = ENOMEM;
         return NULL;
     }
-    semaphore->value = value;
-    semaphore->wakeup = 0;
+    semaphore->value = value; // valeur de la sémaphore initialisée à value
+    semaphore->wakeup = 0; // aucun thread à réveiller pour l'instant
 
     int v = 0;
-    semaphore->verrou = v;
+    semaphore->verrou = v; // verrou pour protéger l'accès à la valeur de la sémaphore
 
-    cond_t *cond = cond_init();
+    cond_t *cond = cond_init(); // initialisation de la variable conditionnelle associée à la sémaphore
     if (cond == NULL) {
         return NULL;
     }
@@ -75,6 +79,8 @@ mysem_t *mysem_init(int value) {
     return semaphore;
 }
 
+// décrémente la valeur de la sémaphore, si elle est négative, 
+// ajoute le thread appelant dans la file
 void mysem_wait(mysem_t *semaphore) {
 
     lock(&(semaphore->verrou));
@@ -82,24 +88,27 @@ void mysem_wait(mysem_t *semaphore) {
 
     if (semaphore->value < 0) {
         cond_wait(semaphore->cond, &(semaphore->verrou));
-        while(semaphore->wakeup < 0); // loop until wake up
-        semaphore->wakeup--; // consume one wake up
+        while(semaphore->wakeup < 0); // boucle jusqu'à pouvoir se réveiller
+        semaphore->wakeup--; // consomme un réveil
     }
     unlock(&(semaphore->verrou));
 }
 
+// incrémente la valeur de la sémaphore, si elle est négative ou nulle,
+// il y a des threads bloqués dans la file -> on débloque le premier
 void mysem_post(mysem_t *semaphore) {
 
     lock(&(semaphore->verrou));
     semaphore->value++;
 
     if (semaphore->value <= 0) {
-        semaphore->wakeup++;
+        semaphore->wakeup++; // un thread supplémentaire peut se réveiller
         cond_signal(semaphore->cond);
     }
     unlock(&(semaphore->verrou));
 }
 
+// destruction de la sémaphore
 int mysem_destroy(mysem_t *semaphore) {
 
     int err;

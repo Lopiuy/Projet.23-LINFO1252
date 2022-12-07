@@ -4,11 +4,14 @@
 #include <string.h>
 #include <errno.h>
 
-#define N 6400
-int min = 1000000;
-int max = 0;
+#define N 6400 // nombre de total de sections critiques à effectuer
 
-int verrou = 0;
+// programme pour déterminer les valeurs minimale et maximale d'attente
+
+int min = 1000000; // valeur d'attente minimale initiale
+int max = 0; // valeur d'attente maximale initiale
+
+int verrou = 0; // verrou TTAS
 
 int testAndSettest(int* verrou,int a){
     int ret;
@@ -39,10 +42,10 @@ void unlocktest(int *verrou) {
 }
 
 void *func(void *param){
-    int stop = *((int *) param);
+    int stop = *((int *) param); // nombre de sections critique à effectuer par thread
     for (int i = 0; i < stop; i++) {
         locktest(&verrou);
-        // critical section
+        // section critique
         for (int i = 0; i < 10000; i++);
         unlocktest(&verrou);
     }
@@ -56,12 +59,13 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
 
-    int nthreads = atoi(argv[1]);
+    int nthreads = atoi(argv[1]); // nombre de threads d'exécution
     pthread_t threads[nthreads];
 
+    // lancement des threads
     for (int i = 0; i < nthreads ; i++) {
 
-        int p = N/nthreads;
+        int p = N/nthreads; // nombre de sections critique à effectuer par thread
         if (i == nthreads - 1){p += N % nthreads;}
         int *param = (int *) malloc(sizeof(int));
         memcpy(param, &p, sizeof(int));
@@ -72,12 +76,15 @@ int main(int argc, char *argv[]){
         }
     }
 
+    // terminaison des threads
     for (int i = 0; i < nthreads ; i++) {
         if (0 != pthread_join(threads[i], NULL)) {
             fprintf(stderr, "Error: %s\n", strerror(errno));
             exit(EXIT_FAILURE);
         }
     }
+
+    // impression des valeurs reccueillies
     printf("%d,%d,",min,max);
     printf("%d\n",nthreads);
 

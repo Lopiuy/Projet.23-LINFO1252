@@ -3,7 +3,7 @@
 
 typedef struct node node_t;
 struct node {
-    int *id;
+    int *id; // id du thread 
     node_t *next;
 };
 

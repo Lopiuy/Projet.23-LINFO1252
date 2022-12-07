@@ -4,6 +4,7 @@
 #include <errno.h>
 #include "../../headers/queue.h"
 
+// opération classique de dequeue sur une file
 int *dequeue(queue_t *q) {
     if (q->first == NULL) {
         return NULL;
@@ -15,7 +16,9 @@ int *dequeue(queue_t *q) {
     return id;
 }
 
-void enqueue(queue_t *q, int *id) {
+// opération classique de enqueue sur une file
+// le second argument est l'identifiant du verrou inhérent à un thread endormi
+void enqueue(queue_t *q, int *id) { 
     node_t *newNode = (node_t *) malloc(sizeof(node_t));
     if (newNode == NULL) {
         fprintf(stderr, "Error: %s\n", strerror(errno));
