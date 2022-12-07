@@ -6,23 +6,23 @@
 #include "../../headers/mysemttas.h"
 
 int* buffer;
-int buff_mutex = 0;
+int buff_mutex = 0; // protège l'accès au buffer
 mysem_t* sem_full;
 mysem_t* sem_empty;
-int buf_in_index = 0;
-int buf_out_index = 0;
+int buf_in_index = 0;   // index d'entrée du buffer
+int buf_out_index = 0;  // index de sortie du buffer
 
 
 void* producer_func(void* arg){
-    int* iter = (int*)arg;
+    int* iter = (int*)arg;  // nombre de production à effectuer
     for(int i = 0; i < *iter; i++) {
-        for (int j = 0; j < 10000; j++) {               //simulate production
+        for (int j = 0; j < 10000; j++) {   // simule la production
         }
 
         mysem_wait(sem_empty);
         lock(&buff_mutex);
 
-        buffer[buf_in_index] = 2;
+        buffer[buf_in_index] = 2;       // place une valeur dans le buffer
         buf_in_index = (buf_in_index + 1) % 8;
 
         unlock(&buff_mutex);
@@ -34,18 +34,18 @@ void* producer_func(void* arg){
 }
 
 void* consumer_func(void* arg){
-    int* iter = (int*)arg;
+    int* iter = (int*)arg;  // nombre de production à effectuer
     for(int i = 0; i < *iter; i++){
         mysem_wait(sem_full);
         lock(&buff_mutex);
 
-        buffer[buf_out_index] = 0;
+        buffer[buf_out_index] = 0;      // récupère la valeur du buffer
         buf_out_index = (buf_out_index + 1) % 8;
 
         unlock(&buff_mutex);
         mysem_post(sem_empty);
 
-        for(int j = 0; j < 10000; j++){                     //simulate consumption
+        for(int j = 0; j < 10000; j++){     // simule consommation
         }
     }
     free(iter);
@@ -87,7 +87,7 @@ int main(int argc, char * argv[]){
     pthread_t producers[nb_producers];
 
 
-    int iter = 8192/nb_consumers;
+    int iter = 8192/nb_consumers;   // répartition de la charge de travail des consommateurs
     for(int i = 0; i < nb_consumers; i++){
         if(i == nb_consumers-1){
             iter += 8192%nb_consumers;
@@ -105,7 +105,7 @@ int main(int argc, char * argv[]){
     }
 
 
-    iter = 8192/nb_producers;
+    iter = 8192/nb_producers;   // répartition de la charge de travail des producteurs
     for(int i = 0; i < nb_producers; i++){
         if(i == nb_producers-1){
             iter += 8192%nb_producers;

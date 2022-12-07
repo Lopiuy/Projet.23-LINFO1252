@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# shellcheck disable=SC2016
-
 NTHREADS=$(nproc)
 MAX=$((NTHREADS*2))
 THREADS=($(for ((i=1;i<=$MAX;i*=2)); do echo "${i}"; done))

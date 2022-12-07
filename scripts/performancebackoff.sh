@@ -1,13 +1,11 @@
 #!/bin/bash
 
-# shellcheck disable=SC2016
-
 NTHREADS=$(nproc)
 MAX=$((NTHREADS*2))
 THREADS=($(for ((i=1;i<=$MAX;i*=2)); do echo "${i}"; done))
 
-./scripts/performanceBackoffValues.sh
-IT=$(python3 src/BackOff/backoffValue.py)
+./scripts/performanceBackoffValues.sh      #récupère les valeurs minimale et maximale d'attente du backoff
+IT=$(python3 src/BackOff/backoffValue.py)  #calcule la moyenne des maximum
 
 echo "nb threads,measure i,time" &> measures/measure_backoff.csv
 

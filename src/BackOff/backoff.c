@@ -6,15 +6,15 @@
 
 #define N 6400
 
-int min;
-int max;
+int min;        // valeur minimale d'attente backoff
+int max;        // valeur maximale d'attente backoff
 int verrou = 0;
 
 
 void *func(void *param){
     int stop = *((int *) param);
     for (int i = 0; i < stop; i++) {
-        lock(&verrou,(i%min)+1,max);
+        lock(&verrou,(i%min)+1,max);    // valeurs de minimum pseudo aléatoire
         // critical section
         for (int j = 0; j < 10000; j++);
         unlock(&verrou);
@@ -35,14 +35,13 @@ int main(int argc, char *argv[]){
         min++;
     }
     max = atoi(argv[3]);
+
     pthread_t threads[nthreads];
 
-
-    for (int i = 0; i < nthreads ; i++) {
-
-        int p = N/nthreads;
+    for (int i = 0; i < nthreads; i++){
+        int p = N/nthreads;                             // repartition entre les threads de la charge de travail
         if (i == nthreads - 1){p += N % nthreads;}
-        int *param = (int *) malloc(sizeof(int));
+        int *param = (int *) malloc(sizeof(int));  // nombre d'accès à la section critique d'un thread
         if(param == NULL){
             perror("Allocation failed");
             return -1;

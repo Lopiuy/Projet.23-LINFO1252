@@ -4,26 +4,26 @@
 #include <string.h>
 #include "../../headers/myttasmutex.h"
 
-int* sticks_mutex;
-int nb_philosophers = 0;
-int nb_sticks = 0;
+int* sticks_mutex;  // protège l'accès aux baguettes
+int nb_philosophers = 0;    // nombre de philosophes
+int nb_sticks = 0;          // nombre de baguettes
 
 
-void eat(int id) { //simulates an eating philosopher
+void eat() { // simule un philosophe qui mange
     return;
 }
 
-void think(int id){ //simulates a thinking philosopher
+void think(){ // simule un philosophe qui pense
     return;
 }
 
 void* philosopher(void* args){
-    int *id = (int*)args;                   //philosopher identity number
-    int left = *id;                         //id of his left stick
-    int right = (left + 1) % nb_sticks;     //id of his right stick
+    int *id = (int*)args;                   // chiffre d'identité du philosophe
+    int left = *id;                         // id de sa baguette de gauche
+    int right = (left + 1) % nb_sticks;     // id de se baguette de droite
     int i = 0;
-    while(i < 100000){                      //each philosopher does 100000 thinking-eating cycles
-        think(*id);
+    while(i < 100000){                      // chaque philosophe fais 100000 cyles pensé-mangé
+        think();
         if(left<right){
             lock(&sticks_mutex[left]);
             lock(&sticks_mutex[right]);
@@ -31,7 +31,7 @@ void* philosopher(void* args){
             lock(&sticks_mutex[right]);
             lock(&sticks_mutex[left]);
         }
-        eat(*id);
+        eat();
         unlock(&sticks_mutex[left]);
         unlock(&sticks_mutex[right]);
         i++;
@@ -49,13 +49,13 @@ int main(int argc, char * argv[]){
     nb_philosophers = atoi(argv[1]);
     nb_sticks = atoi(argv[1]);
 
-    if(nb_sticks == 1){nb_sticks++;}                    //case with 1 philosopher
+    if(nb_sticks == 1){nb_sticks++;}    // cas avec 1 philosophe
 
     pthread_t philosophers[nb_philosophers];
     sticks_mutex = (int*) calloc(nb_sticks, sizeof(int));
 
 
-    for(int i = 0; i < nb_philosophers; i++){           //launching philosophers
+    for(int i = 0; i < nb_philosophers; i++){   // lancer les philosophes
         int* id = (int*)malloc(sizeof(int));
         if(id == NULL){
             perror("Mutexes malloc failed with error");

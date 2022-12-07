@@ -3,35 +3,32 @@
 #include <string.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include <errno.h>
 
-#define Nw 640 // total number of writings // to change -> 640 (x128)
-#define Nr 2560 // total number of readings // to change -> 2560 (x128)
+#define Nw 640   // nombre total d'écriture
+#define Nr 2560  // nombre total de lecture
 
-pthread_mutex_t mutex_readcount; //Protège readcount
-pthread_mutex_t mutex_writecount; //Protège writecount
+pthread_mutex_t mutex_readcount;  // protège readcount
+pthread_mutex_t mutex_writecount; // protège writecount
 pthread_mutex_t z;
 
-sem_t wsem; //Accès exclusif à la db
-sem_t rsem; //Pour bloquer des readers
+sem_t wsem;   // accès exclusif à la database
+sem_t rsem;   // pour bloquer des readers
 
-int readcount = 0;
-int writecount = 0;
+int readcount = 0;  // nombre de lecteurs actifs
+int writecount = 0; // nombre d'écrivains actifs
 
 
 void* writer(void* arg)
 {
-    int *stop = (int *) arg;
-    for (int i = 0; i < *stop; i++)
-    {
+    int *stop = (int *) arg;    // nombre d'écriture à effectuer
+    for (int i = 0; i < *stop; i++){
         if(pthread_mutex_lock(&mutex_writecount)){
             perror("writer mutex failed with error");
             exit(-1);
         }
-        writecount++;
-        if (writecount==1)
-        {
-            if (sem_wait(&rsem)){
+        writecount++;   // on augmente le nombre d'écrivains actifs
+        if (writecount==1){
+            if (sem_wait(&rsem)){   // attend que le lecteur et fini de lire et empêche les suivants de lire (priorité aux écrivains)
                 perror("sem_wait failed with error");
                 exit(-1);
             }
@@ -40,7 +37,7 @@ void* writer(void* arg)
             perror("writer mutex failed with error");
             exit(-1);
         }
-        if(sem_wait(&wsem)){
+        if(sem_wait(&wsem)){    // attente d'accès à la database
             perror("sem_wait failed with error");
             exit(-1);
         }
@@ -56,10 +53,10 @@ void* writer(void* arg)
             perror("writer mutex failed with error");
             exit(-1);
         }
-        writecount--;
-        if(writecount==0)
-        {
-            if(sem_post(&rsem)){
+        writecount--;   // décrémente le nombre d'écrivains actifs
+
+        if(writecount==0){          // si plus d'écrivains actifs
+            if(sem_post(&rsem)){    //  permettre au lecteurs de lire
                 perror("sem_post failed with error");
                 exit(-1);
             }
@@ -83,7 +80,7 @@ void* reader(void* arg)
             exit(-1);
         }
 
-        if(sem_wait(&rsem)){  //un seul reader à la fois
+        if(sem_wait(&rsem)){    // un seul lecteur peu lire à la fois
             perror("sem_wait failed with error");
             exit(-1);
         }
@@ -91,10 +88,10 @@ void* reader(void* arg)
             perror("reader mutex failed with error");
             exit(-1);
         }
-        readcount++;
+        readcount++;    // on augmente le nombre de lecteurs actifs
         if (readcount==1)
         {
-            if(sem_wait(&wsem)){
+            if(sem_wait(&wsem)){    // empecher les écrivains d'écrire
                 perror("sem_wait failed with error");
                 exit(-1);
             }
@@ -103,15 +100,15 @@ void* reader(void* arg)
             perror("reader mutex failed with error");
             exit(-1);
         }
-        if(sem_post(&rsem)) { //libération du prochain reader
+        if(sem_post(&rsem)) {  // libération du de l'écrivain ou du prochain lecteur en attente
             perror("sem_post failed with error");
             exit(-1);
         }
 
-        if(pthread_mutex_unlock(&z)) {              //si on a un 2ème reader et un writer qui attende wsem (sem_wait(&rsem)),
-            perror("z mutex failed with error");    // il faut donner la priorité au writer. En faisant ceci, on empêche qu'un 2ème
-            exit(-1);                               // reader attende (vu qu'il doit attendre que z est unlock, et le post rsem est fait
-        }                                           // avant l'unlock -> writer va être libéré avant)
+        if(pthread_mutex_unlock(&z)) {              // si on a un 2ème reader et un writer qui attende rsem,
+            perror("z mutex failed with error");    //  on donne la priorité à l'écrivain. En faisant ceci, on empêche qu'un 2ème
+            exit(-1);                               //  reader attende (vu qu'il doit attendre que z est unlock, et le post rsem est fait
+        }                                           //  avant l'unlock -> écrivain va être libéré avant)
 
         // read database
         for (int i = 0; i < 10000; i++);
@@ -120,10 +117,9 @@ void* reader(void* arg)
             perror("reader mutex failed with error");
             exit(-1);
         }
-        readcount--;
-        if(readcount==0)
-        {
-            if(sem_post(&wsem)){
+        readcount--;    // décrémente le nombre d'écrivains actifs
+        if(readcount==0){           // si plus de lecteurs actifs
+            if(sem_post(&wsem)){    //  permettre au écrivains d'écrire
                 perror("sem_post failed with error");
                 exit(-1);
             }
@@ -162,7 +158,7 @@ int main(int argc, char *argv[]){
 
     for (int i = 0; i < nwriters; i++) {
         
-        int p = Nw / nwriters;
+        int p = Nw / nwriters;      // répartition de la charge de travail des écrivains
         if (i == nwriters-1){p += Nw % nwriters;}
         int *param = (int *) malloc(sizeof(int));
         memcpy(param, &p, sizeof(int));
@@ -175,7 +171,7 @@ int main(int argc, char *argv[]){
 
     for (int i = 0; i < nreaders; i++) {
         
-        int p = Nr / nreaders;
+        int p = Nr / nreaders;      // répartition de la charge de travail des lecteurs
         if (i == nreaders-1){p += Nr % nreaders;}
         int* param = (int *) malloc(sizeof(int));
         memcpy(param, &p, sizeof(int));
