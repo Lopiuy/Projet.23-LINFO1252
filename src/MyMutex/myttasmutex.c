@@ -13,9 +13,9 @@ int testAndSet(int* verrou,int a){
 }
 
 void lock(int *verrou){
-    while (testAndSet(verrou,1)){
+    do {
         while(*verrou);
-    }
+    }while (testAndSet(verrou,1));
 }
 
 
